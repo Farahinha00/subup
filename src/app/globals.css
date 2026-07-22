@@ -1,0 +1,167 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --fond:         #FAF8F5;
+    --vert:         #1F5A44;
+    --vert-clair:   #26694F;
+    --vert-pale:    #EAF3EE;
+    --corail:       #E2703A;
+    --corail-clair: #F2905E;
+    --corail-pale:  #FFF1E7;
+    --corail-fonce: #B8552A;
+    --ardoise:      #221F1D;
+    --ardoise-moyen:#4A453F;
+    --ardoise-clair:#8A8378;
+    --pierre:       #E7E1D9;
+    --pierre-clair: #F1EEE9;
+  }
+
+  body {
+    background-color: var(--fond);
+    color: var(--ardoise);
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@layer utilities {
+  .font-grotesk { font-family: 'Space Grotesk', system-ui, sans-serif; }
+
+  /* Fond */
+  .bg-fond   { background-color: var(--fond); }
+  .text-fond { color: var(--fond); }
+
+  /* Vert */
+  .bg-vert        { background-color: var(--vert); }
+  .bg-vert-clair  { background-color: var(--vert-clair); }
+  .bg-vert-pale   { background-color: var(--vert-pale); }
+  .text-vert      { color: var(--vert); }
+  .text-vert-pale { color: var(--vert-pale); }
+  .border-vert    { border-color: var(--vert); }
+  .ring-vert      { --tw-ring-color: var(--vert); }
+
+  /* Corail */
+  .bg-corail        { background-color: var(--corail); }
+  .bg-corail-clair  { background-color: var(--corail-clair); }
+  .bg-corail-pale   { background-color: var(--corail-pale); }
+  .bg-corail-fonce  { background-color: var(--corail-fonce); }
+  .text-corail      { color: var(--corail); }
+  .text-corail-clair{ color: var(--corail-clair); }
+  .text-corail-fonce{ color: var(--corail-fonce); }
+  .border-corail    { border-color: var(--corail); }
+
+  /* Ardoise */
+  .bg-ardoise       { background-color: var(--ardoise); }
+  .bg-ardoise-clair { background-color: var(--ardoise-clair); }
+  .text-ardoise       { color: var(--ardoise); }
+  .text-ardoise-moyen { color: var(--ardoise-moyen); }
+  .text-ardoise-clair { color: var(--ardoise-clair); }
+
+  /* Pierre */
+  .bg-pierre       { background-color: var(--pierre); }
+  .bg-pierre-clair { background-color: var(--pierre-clair); }
+  .border-pierre       { border-color: var(--pierre); }
+  .border-pierre-clair { border-color: var(--pierre-clair); }
+
+  /* Hover variants */
+  .hover\:bg-vert-clair:hover  { background-color: var(--vert-clair); }
+  .hover\:bg-corail-fonce:hover{ background-color: var(--corail-fonce); }
+  .hover\:bg-pierre:hover      { background-color: var(--pierre); }
+  .hover\:text-vert:hover      { color: var(--vert); }
+  .hover\:text-ardoise:hover   { color: var(--ardoise); }
+  .hover\:text-fond:hover      { color: var(--fond); }
+  .hover\:border-vert:hover    { border-color: var(--vert); }
+}
+
+@layer components {
+  /* --- Boutons --- */
+  .btn-primary {
+    @apply font-semibold px-5 py-2.5 rounded-[9px] active:scale-95 transition-all duration-150
+           disabled:opacity-40 disabled:cursor-not-allowed text-sm;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    background-color: var(--corail);
+    color: #fff;
+  }
+  .btn-primary:hover { background-color: var(--corail-fonce); }
+
+  .btn-secondary {
+    @apply font-medium px-5 py-2.5 rounded-[9px] active:scale-95 transition-all duration-150 text-sm;
+    border: 1px solid var(--pierre);
+    background-color: #fff;
+    color: var(--ardoise);
+  }
+  .btn-secondary:hover { background-color: color-mix(in srgb, var(--pierre) 30%, transparent); }
+
+  .btn-vert {
+    @apply font-semibold px-5 py-2.5 rounded-[9px] active:scale-95 transition-all duration-150 text-sm;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    background-color: var(--vert);
+    color: var(--fond);
+  }
+  .btn-vert:hover { background-color: var(--vert-clair); }
+
+  /* --- Cartes --- */
+  .card {
+    @apply bg-white rounded-[16px] p-5;
+    border: 1px solid var(--pierre);
+  }
+  .card-metric {
+    @apply rounded-xl p-4;
+    background-color: var(--pierre-clair);
+  }
+
+  /* --- Formulaires --- */
+  .input {
+    @apply w-full rounded-xl px-4 py-2.5 text-sm bg-white
+           focus:outline-none transition;
+    border: 1px solid var(--pierre);
+    color: var(--ardoise);
+  }
+  .input::placeholder { color: var(--ardoise-clair); }
+  .input:focus {
+    border-color: var(--corail);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--corail) 20%, transparent);
+  }
+
+  .label {
+    @apply block text-xs font-medium uppercase tracking-wide mb-1.5;
+    color: var(--ardoise-clair);
+  }
+
+  /* --- Badges statut --- */
+  .badge-eligible {
+    @apply inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full;
+    background-color: var(--vert-pale);
+    color: var(--vert);
+  }
+  .badge-probable {
+    @apply inline-flex items-center gap-1 bg-amber-50 text-amber-700 text-xs font-medium px-2.5 py-1 rounded-full;
+  }
+  .badge-non-eligible {
+    @apply inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full;
+    background-color: var(--pierre-clair);
+    color: var(--ardoise-clair);
+  }
+
+  /* --- Radio card (wizard) --- */
+  .radio-card {
+    @apply flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all text-sm;
+    border: 1px solid var(--pierre);
+    color: var(--ardoise);
+  }
+  .radio-card:hover {
+    border-color: color-mix(in srgb, var(--corail) 40%, transparent);
+    background-color: color-mix(in srgb, var(--corail-pale) 30%, transparent);
+  }
+  .radio-card-active {
+    border-color: var(--corail);
+    background-color: var(--corail-pale);
+    color: var(--corail-fonce);
+    font-weight: 500;
+  }
+}
