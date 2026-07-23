@@ -61,7 +61,7 @@ export default function WizardQuestionsManquantes({
         questionsVisibles.map((q) => (
           <QuestionBlock
             key={q.champ} q={q} reponses={reponses}
-            onChange={q.champ === 'emplois_prevus' ? handleEmploisChange as never : onChange}
+            onChange={q.champ === 'emplois_prevus' ? (_champ: keyof Reponses, v: unknown) => handleEmploisChange(v as string) : onChange}
           />
         ))
       )}
