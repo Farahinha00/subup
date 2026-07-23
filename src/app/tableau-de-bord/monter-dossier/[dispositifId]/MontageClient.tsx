@@ -232,17 +232,18 @@ export default function MontageClient({
     } finally { setLoading(false) }
   }
 
-  function base64ToBytes(base64: string): Uint8Array<ArrayBuffer> {
+  function base64ToArrayBuffer(base64: string): ArrayBuffer {
     const binary = atob(base64)
-    const bytes = new Uint8Array(binary.length)
+    const buffer = new ArrayBuffer(binary.length)
+    const bytes = new Uint8Array(buffer)
     for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i)
-    return bytes as Uint8Array<ArrayBuffer>
+    return buffer
   }
 
   function downloadDoc(docId: string, label: string) {
     const base64 = generatedDocs[docId]
     if (!base64) return
-    const blob = new Blob([base64ToBytes(base64)], { type: 'application/pdf' })
+    const blob = new Blob([base64ToArrayBuffer(base64)], { type: 'application/pdf' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url; a.download = `${label.replace(/[\s/]+/g, '_')}.pdf`; a.click()
@@ -264,7 +265,7 @@ export default function MontageClient({
       const m = docModes[doc.id]
       const safeName = doc.label.replace(/[\s/\\:*?"<>|]+/g, '_')
       if (m === 'generer' && generatedDocs[doc.id]) {
-        zip.file(`${safeName}.pdf`, base64ToBytes(generatedDocs[doc.id]))
+        zip.file(`${safeName}.pdf`, base64ToArrayBuffer(generatedDocs[doc.id]))
       } else if (m === 'upload' && docFiles[doc.id]) {
         zip.file(docFiles[doc.id].name, docFiles[doc.id])
       }
