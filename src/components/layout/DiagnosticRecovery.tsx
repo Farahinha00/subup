@@ -12,7 +12,8 @@ export default function DiagnosticRecovery() {
 
   useEffect(() => {
     const draft = localStorage.getItem(STORAGE_KEY)
-    if (!draft) return
+    const pending = localStorage.getItem('diagnostic_recovery_pending')
+    if (!draft || !pending) return
 
     async function recover() {
       const supabase = createClient()
@@ -34,10 +35,11 @@ export default function DiagnosticRecovery() {
             body: JSON.stringify({ diagnosticId: diagnostic.id }),
           })
           localStorage.removeItem(STORAGE_KEY)
+          localStorage.removeItem('diagnostic_recovery_pending')
           router.push(`/resultats/${diagnostic.id}`)
         }
       } catch {
-        // draft malformé ou erreur réseau — on le laisse en place
+        localStorage.removeItem('diagnostic_recovery_pending')
       }
     }
 

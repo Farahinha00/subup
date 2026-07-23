@@ -58,6 +58,9 @@ function InscriptionForm() {
       }
       router.push('/tableau-de-bord')
     } else {
+      if (fromDiagnostic && localStorage.getItem(STORAGE_KEY)) {
+        localStorage.setItem('diagnostic_recovery_pending', '1')
+      }
       setConfirmationEnvoyee(true)
       setLoading(false)
     }
