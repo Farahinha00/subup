@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { unstable_cache } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
-import { supabasePublic } from '@/lib/supabase/public'
+import { getSupabasePublic } from '@/lib/supabase/public'
 import { matcherTousDispositifs } from '@/lib/matching/engine'
 import type { Dispositif, Reponses } from '@/types'
 
 // Cache dispositifs 1h — revalidé par tag 'dispositifs' si l'admin modifie
 const getDispositifsActifs = unstable_cache(
   async (pays: string) => {
-    const { data } = await supabasePublic
+    const { data } = await getSupabasePublic()
       .from('dispositifs')
       .select('*')
       .eq('actif', true)
