@@ -28,7 +28,7 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
   // Routes protégées (nécessitent une connexion)
-  const protectedRoutes = ['/resultats']
+  const protectedRoutes = ['/tableau-de-bord', '/resultats']
   const isProtected = protectedRoutes.some((r) => pathname.startsWith(r))
 
   if (!user && isProtected) {

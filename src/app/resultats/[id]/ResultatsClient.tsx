@@ -84,8 +84,8 @@ export default function ResultatsClient({ diagnosticId, resultats, demandesExist
       }}>
         <div style={{ maxWidth: 920, margin: '0 auto', padding: '0 32px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <Link href="/diagnostic" style={{ fontSize: 14, fontWeight: 600, color: '#8A8378', display: 'flex', alignItems: 'center', gap: 6, textDecoration: 'none' }}>
-              ← Nouveau diagnostic
+            <Link href="/tableau-de-bord" style={{ fontSize: 14, fontWeight: 600, color: '#8A8378', display: 'flex', alignItems: 'center', gap: 6, textDecoration: 'none' }}>
+              ← Tableau de bord
             </Link>
             <div style={{ width: 1, height: 18, background: '#E7E1D9' }} />
             <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 9, textDecoration: 'none' }}>
@@ -97,9 +97,9 @@ export default function ResultatsClient({ diagnosticId, resultats, demandesExist
               <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 16, color: '#221F1D' }}>sub&apos;up</span>
             </Link>
           </div>
-          <Link href="/diagnostic"
+          <Link href="/tableau-de-bord"
             style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 14, background: '#1F5A44', color: '#FAF8F5', borderRadius: 9, padding: '10px 20px', textDecoration: 'none' }}>
-            Nouveau diagnostic →
+            Mon tableau de bord →
           </Link>
         </div>
       </div>
