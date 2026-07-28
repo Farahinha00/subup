@@ -5,13 +5,13 @@ import { createClient } from '@/lib/supabase/server'
 const steps = [
   { n: '01', title: 'Décrivez votre projet', desc: 'Secteur, taille, région — décrivez en quelques mots ou répondez aux questions guidées.' },
   { n: '02', title: 'Recevez vos matchs', desc: 'Sub\'up croise votre profil avec les dispositifs actifs et calcule votre éligibilité réelle.' },
-  { n: '03', title: 'Montez le dossier', desc: 'Documents à préparer, organismes à contacter, étapes pour déposer votre dossier.' },
+  { n: '03', title: 'Passez à l\'action', desc: 'Identifiez les dispositifs accessibles, les critères validés et les prochaines étapes.' },
 ]
 
 const audiences = [
   { title: 'TPE & indépendants', desc: 'Trouvez les aides de démarrage et d\'investissement sans passer par un consultant.', bg: 'bg-vert-pale', dot: 'bg-vert' },
   { title: 'PME en croissance', desc: 'Fonds régionaux, cofinancement export, subventions à l\'innovation.', bg: 'bg-corail-pale', dot: 'bg-corail' },
-  { title: 'Experts-comptables', desc: 'Gérez l\'éligibilité de tout votre portefeuille clients depuis un seul tableau de bord.', bg: 'bg-pierre-clair', dot: 'bg-ardoise-clair' },
+  { title: 'Experts-comptables', desc: 'Analysez l\'éligibilité de vos clients aux aides publiques en quelques minutes.', bg: 'bg-pierre-clair', dot: 'bg-ardoise-clair' },
 ]
 
 export default async function LandingPage() {
@@ -66,7 +66,7 @@ export default async function LandingPage() {
                 className="btn-primary py-4 px-7 text-base rounded-[10px] inline-block">
                 Vérifier mon éligibilité →
               </Link>
-              <Link href="/catalogue" className="text-[15px] font-semibold text-ardoise hover:text-vert transition flex items-center gap-1.5">
+              <Link href="/diagnostic" className="text-[15px] font-semibold text-ardoise hover:text-vert transition flex items-center gap-1.5">
                 Voir les dispositifs →
               </Link>
             </div>
@@ -117,9 +117,9 @@ export default async function LandingPage() {
         <div className="max-w-6xl mx-auto px-6 py-20">
           <div className="max-w-lg mx-auto text-center mb-14">
             <h2 className="font-grotesk font-bold text-[32px] text-ardoise tracking-tight mb-3">
-              Trois étapes, un dossier complet
+              Trois étapes, zéro jargon
             </h2>
-            <p className="text-ardoise-clair text-[15px]">De l&apos;analyse à la soumission, sans jargon administratif.</p>
+            <p className="text-ardoise-clair text-[15px]">De la description de votre projet à vos résultats d&apos;éligibilité, en quelques minutes.</p>
           </div>
           <div className="grid sm:grid-cols-3 gap-6">
             {steps.map((s) => (

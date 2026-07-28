@@ -28,7 +28,7 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
   // Routes protégées (nécessitent une connexion)
-  const protectedRoutes = ['/tableau-de-bord', '/resultats']
+  const protectedRoutes = ['/resultats']
   const isProtected = protectedRoutes.some((r) => pathname.startsWith(r))
 
   if (!user && isProtected) {
@@ -36,16 +36,6 @@ export async function middleware(request: NextRequest) {
     url.pathname = '/connexion'
     url.searchParams.set('redirect', pathname)
     return NextResponse.redirect(url)
-  }
-
-  // Route admin
-  if (pathname.startsWith('/admin')) {
-    if (!user) {
-      const url = request.nextUrl.clone()
-      url.pathname = '/connexion'
-      return NextResponse.redirect(url)
-    }
-    // La vérification du rôle admin se fait dans la page elle-même
   }
 
   return supabaseResponse
