@@ -1,13 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { Ratelimit } from '@upstash/ratelimit'
+import { Redis } from '@upstash/redis'
 import { z } from 'zod'
 import { WIZARD_QUESTIONS_MA, buildExtractionSchema } from '@/lib/wizard-questions'
 
-// ── Rate limiting in-memory (single instance) ─────────────────────────────────
-// Pour multi-instance (Vercel Edge), remplacer par Upstash/Redis
+// ── Rate limiting ──────────────────────────────────────────────────────────────
+// Si UPSTASH_REDIS_REST_URL est configuré → Redis distribué (Vercel multi-instance)
+// Sinon → fallback in-memory (single instance, suffit en dev / faible trafic)
+
+let ratelimit: Ratelimit | null = null
+if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+  ratelimit = new Ratelimit({
+    redis: Redis.fromEnv(),
+    limiter: Ratelimit.slidingWindow(5, '1 h'),
+    prefix: 'subup:extraction',
+  })
+}
+
 const rateLimitStore = new Map<string, { count: number; reset: number }>()
 
-function checkRateLimit(ip: string): boolean {
+async function checkRateLimit(ip: string): Promise<boolean> {
+  if (ratelimit) {
+    const { success } = await ratelimit.limit(ip)
+    return success
+  }
   const now = Date.now()
   const entry = rateLimitStore.get(ip)
   if (!entry || now > entry.reset) {
@@ -19,25 +36,19 @@ function checkRateLimit(ip: string): boolean {
   return true
 }
 
-// ── Schéma Zod généré depuis la config ────────────────────────────────────────
+// ── Schéma Zod ────────────────────────────────────────────────────────────────
 function buildZodSchema() {
   const conf = z.enum(['certain', 'inferred', 'missing'])
   const fields: Record<string, z.ZodTypeAny> = {}
-
   for (const q of WIZARD_QUESTIONS_MA) {
     if (q.type === 'boolean') {
       fields[q.champ] = z.object({ value: z.boolean().nullable(), confidence: conf })
     } else if (q.type === 'year') {
-      fields[q.champ] = z.object({
-        value: z.number().int().min(1950).max(2030).nullable(),
-        confidence: conf,
-      })
+      fields[q.champ] = z.object({ value: z.number().int().min(1950).max(2030).nullable(), confidence: conf })
     } else {
-      // enum — on accepte string nullable, la validation des options se fait en post-traitement
       fields[q.champ] = z.object({ value: z.string().nullable(), confidence: conf })
     }
   }
-
   return z.object(fields)
 }
 
@@ -76,7 +87,8 @@ Retourne un objet JSON unique contenant TOUS les champs du schéma, chacun avec 
 export async function POST(req: NextRequest) {
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
 
-  if (!checkRateLimit(ip)) {
+  const allowed = await checkRateLimit(ip)
+  if (!allowed) {
     return NextResponse.json({ error: 'rate_limit' }, { status: 429 })
   }
 
@@ -114,7 +126,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'api_error' }, { status: 502 })
   }
 
-  // Strip markdown code fences si présentes malgré les instructions
   const cleaned = rawText
     .replace(/^```json\s*/i, '')
     .replace(/^```\s*/, '')
@@ -129,7 +140,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'parse_error' }, { status: 422 })
   }
 
-  // Patch : forcer les valeurs hors-options enum à missing
   const patched = { ...(parsed as Record<string, unknown>) }
   for (const q of WIZARD_QUESTIONS_MA) {
     const field = patched[q.champ] as { value: unknown; confidence: string } | undefined
@@ -147,7 +157,6 @@ export async function POST(req: NextRequest) {
 
   const schema = buildZodSchema()
   const validated = schema.safeParse(patched)
-
   if (!validated.success) {
     console.error('[extraction] Zod validation failed:', validated.error.issues.slice(0, 5))
     return NextResponse.json({ error: 'validation_error' }, { status: 422 })
