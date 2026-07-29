@@ -177,8 +177,15 @@ function DiagnosticInner({ paysActifs, profileReponses }: {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ diagnosticId: diagnostic.id }),
     })
-    if (res.ok) { localStorage.removeItem(STORAGE_KEY); router.push(`/resultats/${diagnostic.id}`) }
-    else setLoading(false)
+    if (res.ok) {
+      localStorage.removeItem(STORAGE_KEY)
+      router.push(`/resultats/${diagnostic.id}`)
+    } else {
+      const errData = await res.json().catch(() => ({})) as { error?: string }
+      console.error('[matching] erreur:', res.status, errData)
+      alert(`Erreur lors de l'analyse (${res.status}). Veuillez réessayer.`)
+      setLoading(false)
+    }
   }
 
   // ── Rendu ─────────────────────────────────────────────────────────────────
