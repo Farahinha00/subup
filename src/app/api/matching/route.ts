@@ -1,23 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { unstable_cache } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
-import { getSupabasePublic } from '@/lib/supabase/public'
 import { matcherTousDispositifs } from '@/lib/matching/engine'
 import type { Dispositif, Reponses } from '@/types'
-
-// Cache dispositifs 1h — revalidé par tag 'dispositifs' si l'admin modifie
-const getDispositifsActifs = unstable_cache(
-  async (pays: string) => {
-    const { data } = await getSupabasePublic()
-      .from('dispositifs')
-      .select('*')
-      .eq('actif', true)
-      .eq('pays', pays)
-    return data ?? []
-  },
-  ['dispositifs-actifs'],
-  { revalidate: 3600, tags: ['dispositifs'] }
-)
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
@@ -38,9 +22,19 @@ export async function POST(request: NextRequest) {
   if (!diagnostic) return NextResponse.json({ error: 'Diagnostic introuvable' }, { status: 404 })
 
   const pays = diagnostic.pays ?? diagnostic.reponses?.pays ?? 'MA'
-  const dispositifs = await getDispositifsActifs(pays)
 
-  if (!dispositifs.length) {
+  const { data: dispositifs, error: dispositifsError } = await supabase
+    .from('dispositifs')
+    .select('*')
+    .eq('actif', true)
+    .eq('pays', pays)
+
+  if (dispositifsError) {
+    console.error('[matching] dispositifs fetch error:', dispositifsError)
+    return NextResponse.json({ error: dispositifsError.message }, { status: 500 })
+  }
+
+  if (!dispositifs || dispositifs.length === 0) {
     return NextResponse.json({ error: 'Aucun dispositif disponible' }, { status: 500 })
   }
 
