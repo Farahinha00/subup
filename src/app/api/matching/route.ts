@@ -1,7 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { unstable_cache } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { getSupabasePublic } from '@/lib/supabase/public'
 import { matcherTousDispositifs } from '@/lib/matching/engine'
 import type { Dispositif, Reponses } from '@/types'
+
+// Cache dispositifs 1h — revalidé par tag 'dispositifs' si l'admin modifie
+const getDispositifsActifs = unstable_cache(
+  async (pays: string) => {
+    const { data } = await getSupabasePublic()
+      .from('dispositifs')
+      .select('*')
+      .eq('actif', true)
+      .eq('pays', pays)
+    return data ?? []
+  },
+  ['dispositifs-actifs'],
+  { revalidate: 3600, tags: ['dispositifs'] }
+)
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
@@ -12,7 +28,6 @@ export async function POST(request: NextRequest) {
   const { diagnosticId } = await request.json()
   if (!diagnosticId) return NextResponse.json({ error: 'diagnosticId manquant' }, { status: 400 })
 
-  // Vérifier que le diagnostic appartient à l'utilisateur
   const { data: diagnostic } = await supabase
     .from('diagnostics')
     .select('*')
@@ -22,25 +37,17 @@ export async function POST(request: NextRequest) {
 
   if (!diagnostic) return NextResponse.json({ error: 'Diagnostic introuvable' }, { status: 404 })
 
-  // Récupérer les dispositifs actifs filtrés par pays du diagnostic
   const pays = diagnostic.pays ?? diagnostic.reponses?.pays ?? 'MA'
-  const { data: dispositifs } = await supabase
-    .from('dispositifs')
-    .select('*')
-    .eq('actif', true)
-    .eq('pays', pays)
+  const dispositifs = await getDispositifsActifs(pays)
 
-  if (!dispositifs || dispositifs.length === 0) {
+  if (!dispositifs.length) {
     return NextResponse.json({ error: 'Aucun dispositif disponible' }, { status: 500 })
   }
 
-  // Supprimer les anciens résultats si re-calcul
   await supabase.from('resultats').delete().eq('diagnostic_id', diagnosticId)
 
-  // Calculer le matching
   const resultats = matcherTousDispositifs(dispositifs as Dispositif[], diagnostic.reponses as Reponses)
 
-  // Persister les résultats
   const rows = resultats.map((r) => ({
     diagnostic_id: diagnosticId,
     dispositif_id: r.dispositif_id,
