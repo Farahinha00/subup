@@ -147,7 +147,10 @@ function DiagnosticInner({ paysActifs, profileReponses }: {
     const supabase = createClient()
     const nbQuestionsAI = mode === 'titre' ? champsAPoser.length : undefined
 
-    let titreFinal = titre.trim()
+    const userTitre = titre.trim()
+    let titreFinal = userTitre
+
+    // Si pas de titre user, on essaie l'IA
     if (!titreFinal) {
       try {
         const res = await fetch('/api/titre-diagnostic', {
@@ -159,6 +162,39 @@ function DiagnosticInner({ paysActifs, profileReponses }: {
           titreFinal = data.titre ?? ''
         }
       } catch {}
+    }
+
+    // Fallback : date du jour avec incrément si déjà pris
+    if (!titreFinal) {
+      const today = new Date()
+      const dateStr = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`
+      const { data: existing } = await supabase
+        .from('diagnostics')
+        .select('titre')
+        .eq('user_id', userId)
+        .ilike('titre', `${dateStr}%`)
+      const existingTitres = new Set((existing ?? []).map((d: { titre: string | null }) => d.titre))
+      if (!existingTitres.has(dateStr)) {
+        titreFinal = dateStr
+      } else {
+        let n = 2
+        while (existingTitres.has(`${dateStr} - ${n}`)) n++
+        titreFinal = `${dateStr} - ${n}`
+      }
+    }
+
+    // Si titre user et il existe déjà → avertir
+    if (userTitre) {
+      const { data: doublon } = await supabase
+        .from('diagnostics')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('titre', userTitre)
+        .limit(1)
+      if (doublon?.length) {
+        const continuer = window.confirm(`Le titre "${userTitre}" existe déjà. Continuer quand même ?`)
+        if (!continuer) { setLoading(false); return }
+      }
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

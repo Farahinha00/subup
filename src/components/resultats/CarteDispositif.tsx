@@ -175,26 +175,6 @@ export default function CarteDispositif({ resultat, onDemandeAccompagnement, dem
               </a>
             )}
 
-            {resultat.statut !== 'non_eligible' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {diagnosticId && (
-                  <Link
-                    href={`/tableau-de-bord/monter-dossier/${d.id}?diagnosticId=${diagnosticId}`}
-                    style={{
-                      fontFamily: "'Space Grotesk', sans-serif",
-                      fontWeight: 600, fontSize: 14,
-                      background: d.documents_requis_generation ? '#E2703A' : '#8A8378',
-                      color: '#FAF8F5',
-                      borderRadius: 10, padding: '12px 22px',
-                      textDecoration: 'none', display: 'block', textAlign: 'center',
-                      opacity: d.documents_requis_generation ? 1 : 0.7,
-                    }}
-                  >
-                    {d.documents_requis_generation ? 'Monter le dossier assisté IA →' : 'Montage IA — bientôt disponible'}
-                  </Link>
-                )}
-              </div>
-            )}
           </div>
         </div>
       )}

@@ -3,18 +3,11 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { LABELS } from '@/lib/labels'
 import type { Diagnostic, Dispositif, Resultat, StatutResultat } from '@/types'
-import SupprimerDiagnostic from './SupprimerDiagnostic'
 
 function formatMontant(v: number, devise: string) {
   if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(1).replace('.0', '')}M ${devise}`
   if (v >= 1_000) return `${Math.round(v / 1_000)}K ${devise}`
   return `${v} ${devise}`
-}
-
-function initiales(prenom?: string | null, nom?: string | null, email?: string) {
-  if (prenom && nom) return (prenom[0] + nom[0]).toUpperCase()
-  if (prenom) return prenom.slice(0, 2).toUpperCase()
-  return (email ?? 'U').slice(0, 2).toUpperCase()
 }
 
 function StatutBadge({ statut }: { statut: StatutResultat }) {
@@ -63,7 +56,6 @@ export default async function TableauDeBord() {
   const recommandes = dernierResultats.filter((r) => r.statut !== 'non_eligible')
 
   const prenom = profile?.prenom ?? user.email?.split('@')[0]
-  const ini = initiales(profile?.prenom, profile?.nom, user.email)
 
   const stats = [
     {
@@ -110,17 +102,13 @@ export default async function TableauDeBord() {
               : ''}
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <Link href="/diagnostic" className="btn-primary px-5 py-2 text-[13px]">
-            + Nouveau diagnostic
-          </Link>
-          <div
-            className="w-9 h-9 rounded-full flex items-center justify-center font-grotesk font-bold text-[13px] flex-shrink-0"
-            style={{ backgroundColor: 'var(--vert)', color: 'var(--fond)' }}
-          >
-            {ini}
-          </div>
-        </div>
+        <Link
+          href="/tableau-de-bord/diagnostics"
+          className="text-[13px] font-semibold transition"
+          style={{ color: 'var(--corail)' }}
+        >
+          Voir mes diagnostics →
+        </Link>
       </div>
 
       {/* ── Stats ── */}
@@ -134,89 +122,6 @@ export default async function TableauDeBord() {
         ))}
       </div>
 
-      {/* ── Mes diagnostics ── */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="font-grotesk font-semibold text-[15px] text-ardoise">Mes diagnostics</h2>
-        <Link href="/diagnostic" className="text-[12px] font-semibold text-corail hover:text-corail-fonce transition">
-          + Nouveau
-        </Link>
-      </div>
-
-      {(diagnostics ?? []).length === 0 ? (
-        <div className="card rounded-[16px] text-center py-12">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-3" style={{ backgroundColor: 'var(--pierre-clair)' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <circle cx="11" cy="11" r="7" stroke="#8A8378" strokeWidth="1.8"/>
-              <path d="M16.5 16.5L21 21" stroke="#8A8378" strokeWidth="1.8" strokeLinecap="round"/>
-            </svg>
-          </div>
-          <p className="text-[13px] text-ardoise-clair mb-4">Aucun diagnostic pour le moment</p>
-          <Link href="/diagnostic" className="btn-primary px-5 py-2 text-[13px] inline-block">
-            Faire mon diagnostic →
-          </Link>
-        </div>
-      ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {(diagnostics as Diagnostic[]).map((diag) => {
-            const results = resultatsMap[diag.id] ?? []
-            const diagEligibles = results.filter((r) => r.statut !== 'non_eligible')
-            const montantTotal = diagEligibles.reduce((sum, r) => {
-              const d = r.dispositif as Dispositif | undefined
-              return sum + (d?.montant_max ?? 0)
-            }, 0)
-            const totalOk = results.reduce((sum, r) => sum + r.criteres_ok.length, 0)
-            const totalManquants = results.reduce((sum, r) => sum + r.criteres_manquants.length, 0)
-            const devise = diag.pays === 'FR' ? 'EUR' : 'MAD'
-            const dateLabel = new Date(diag.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
-
-            return (
-              <div key={diag.id} className="card rounded-[16px]">
-                <div className="flex items-start justify-between gap-3 mb-4">
-                  <div className="min-w-0">
-                    <div className="font-grotesk font-bold text-[15px] text-ardoise leading-snug">
-                      {diag.titre ?? 'Diagnostic d\'éligibilité'}
-                    </div>
-                    <div className="text-[11px] text-ardoise-clair mt-0.5">{dateLabel}</div>
-                  </div>
-                  <div className="flex items-center gap-3 flex-shrink-0">
-                    <SupprimerDiagnostic diagnosticId={diag.id} />
-                    <Link
-                      href={`/resultats/${diag.id}`}
-                      className="text-[12px] font-semibold transition"
-                      style={{ color: 'var(--corail)' }}
-                    >
-                      Voir →
-                    </Link>
-                  </div>
-                </div>
-
-                <div style={{ height: 1, backgroundColor: 'var(--pierre)', marginBottom: 16 }} />
-
-                <div className="text-[12px] text-ardoise-clair mb-1">Montant total estimé</div>
-                <div className="font-grotesk font-bold text-ardoise mb-4" style={{ fontSize: 28, lineHeight: 1.1 }}>
-                  {montantTotal > 0 ? formatMontant(montantTotal, devise) : '—'}
-                </div>
-
-                <div className="flex items-center gap-4">
-                  {totalOk > 0 && (
-                    <span className="text-[13px] font-semibold" style={{ color: 'var(--vert)' }}>
-                      ✓ {totalOk} critère{totalOk > 1 ? 's' : ''} validé{totalOk > 1 ? 's' : ''}
-                    </span>
-                  )}
-                  {totalManquants > 0 && (
-                    <span className="text-[13px] font-semibold" style={{ color: 'var(--corail)' }}>
-                      ◑ {totalManquants} à vérifier
-                    </span>
-                  )}
-                  {results.length === 0 && (
-                    <span className="text-[12px] text-ardoise-clair">Aucun résultat</span>
-                  )}
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      )}
     </div>
   )
 }
