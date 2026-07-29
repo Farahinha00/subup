@@ -20,35 +20,20 @@ export default async function CataloguePage() {
     .from('dispositifs')
     .select('*')
     .eq('actif', true)
-    .order('pays')
+    .eq('pays', 'MA')
     .order('nom')
 
   const list = (dispositifs ?? []) as Dispositif[]
-  const parPays = list.reduce<Record<string, Dispositif[]>>((acc, d) => {
-    if (!acc[d.pays]) acc[d.pays] = []
-    acc[d.pays].push(d)
-    return acc
-  }, {})
 
   return (
     <div className="px-8 py-8 w-full">
       <div className="mb-6">
-        <h1 className="font-grotesk font-bold text-[22px] text-ardoise">Catalogue des dispositifs</h1>
+        <h1 className="font-grotesk font-bold text-[22px] text-ardoise">🇲🇦 Catalogue des dispositifs</h1>
         <p className="text-[13px] text-ardoise-clair mt-1">{list.length} dispositifs actifs</p>
       </div>
 
-      {Object.entries(parPays).map(([pays, items]) => (
-        <div key={pays} className="mb-10">
-          <div className="flex items-center gap-3 mb-4">
-            <h2 className="font-grotesk font-semibold text-[15px] text-ardoise">
-              {pays === 'MA' ? '🇲🇦 Maroc' : '🇫🇷 France'}
-            </h2>
-            <div style={{ flex: 1, height: 1, backgroundColor: 'var(--pierre)' }} />
-            <span className="text-[12px] text-ardoise-clair">{items.length} dispositifs</span>
-          </div>
-
-          <div className="flex flex-col gap-3">
-            {items.map((d) => {
+      <div className="flex flex-col gap-3">
+        {list.map((d) => {
               const criteres: Critere[] = Array.isArray(d.regles?.criteres) ? d.regles.criteres : []
               const montant = d.montant_max
                 ? d.montant_max >= 1_000_000
@@ -126,9 +111,7 @@ export default async function CataloguePage() {
                 </details>
               )
             })}
-          </div>
-        </div>
-      ))}
+      </div>
     </div>
   )
 }

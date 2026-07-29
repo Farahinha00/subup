@@ -126,7 +126,8 @@ function DiagnosticInner({ paysActifs, profileReponses }: {
     }
   }
 
-  function handleWizardClassique() { setMode('wizard'); setEtape(1) }
+  function goEtape(n: number) { setEtape(n); window.scrollTo({ top: 0, behavior: 'smooth' }) }
+  function handleWizardClassique() { setMode('wizard'); goEtape(1) }
 
   function handleRecapContinuer() {
     const champs = getChampsAPoser(reponses)
@@ -295,9 +296,9 @@ function DiagnosticInner({ paysActifs, profileReponses }: {
         {mode === 'wizard' && (
           <>
             <ProgressBar etape={etape} total={totalEtapes} />
-            {etape === 1 && <WizardEtape1 reponses={reponses} onChange={handleChange} onNext={() => setEtape(2)} />}
-            {etape === 2 && <WizardEtape2 reponses={reponses} onChange={handleChange} onNext={() => setEtape(3)} onBack={() => setEtape(1)} />}
-            {etape === 3 && <WizardEtape3 reponses={reponses} onChange={handleChange} onSubmit={() => setMode('titre')} onBack={() => setEtape(2)} loading={false} />}
+            {etape === 1 && <WizardEtape1 reponses={reponses} onChange={handleChange} onNext={() => goEtape(2)} />}
+            {etape === 2 && <WizardEtape2 reponses={reponses} onChange={handleChange} onNext={() => goEtape(3)} onBack={() => goEtape(1)} />}
+            {etape === 3 && <WizardEtape3 reponses={reponses} onChange={handleChange} onSubmit={() => setMode('titre')} onBack={() => goEtape(2)} loading={false} />}
           </>
         )}
 

@@ -25,7 +25,7 @@ export default async function TableauDeBord() {
 
   const [{ data: profile }, { data: diagnostics }] = await Promise.all([
     supabase.from('profiles').select('*').eq('id', user.id).single(),
-    supabase.from('diagnostics').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+    supabase.from('diagnostics').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(4),
   ])
 
   const diagnosticIds = (diagnostics ?? []).map((d: Diagnostic) => d.id)
@@ -121,6 +121,48 @@ export default async function TableauDeBord() {
           </div>
         ))}
       </div>
+
+      {/* ── Diagnostics récents ── */}
+      {(diagnostics ?? []).length > 0 && (
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-grotesk font-semibold text-[14px] text-ardoise">Diagnostics récents</h2>
+            <Link href="/tableau-de-bord/diagnostics" className="text-[12px] font-semibold" style={{ color: 'var(--corail)' }}>
+              Voir tout →
+            </Link>
+          </div>
+          <div className="flex flex-col gap-1.5">
+            {(diagnostics as Diagnostic[]).map((diag) => {
+              const results = resultatsMap[diag.id] ?? []
+              const eligiblesCount = results.filter((r) => r.statut !== 'non_eligible').length
+              const date = new Date(diag.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+              return (
+                <Link
+                  key={diag.id}
+                  href={`/resultats/${diag.id}`}
+                  className="flex items-center gap-4 px-4 py-3 rounded-[10px] transition-colors no-underline"
+                  style={{ backgroundColor: 'white', border: '1px solid var(--pierre)' }}
+                >
+                  <div className="flex-1 min-w-0">
+                    <span className="font-grotesk font-semibold text-[13px] text-ardoise truncate block">
+                      {diag.titre ?? 'Diagnostic sans titre'}
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-ardoise-clair flex-shrink-0">{date}</span>
+                  {results.length > 0 && (
+                    <span
+                      className="text-[11px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0"
+                      style={{ backgroundColor: eligiblesCount > 0 ? '#EAF3EE' : '#F1EEE9', color: eligiblesCount > 0 ? '#1F5A44' : '#8A8378' }}
+                    >
+                      {eligiblesCount} éligible{eligiblesCount > 1 ? 's' : ''}
+                    </span>
+                  )}
+                </Link>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
     </div>
   )
