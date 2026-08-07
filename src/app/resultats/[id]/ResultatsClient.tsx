@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { LogoFondoukBeta } from '@/components/layout/LogoFondouk'
 import CarteDispositif from '@/components/resultats/CarteDispositif'
 import type { Resultat, Pays } from '@/types'
 import { LABELS, ORDRE_CATEGORIES } from '@/lib/labels'
@@ -88,13 +89,8 @@ export default function ResultatsClient({ diagnosticId, resultats, demandesExist
               ← Tableau de bord
             </Link>
             <div style={{ width: 1, height: 18, background: '#E7E1D9' }} />
-            <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 9, textDecoration: 'none' }}>
-              <div style={{ width: 26, height: 26, borderRadius: 8, background: '#1F5A44', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <svg width="13" height="13" viewBox="0 0 100 100">
-                  <polygon points="50,14 86,52 68,52 68,88 32,88 32,52 14,52" fill="#FAF8F5" />
-                </svg>
-              </div>
-              <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 16, color: '#221F1D' }}>sub&apos;up</span>
+            <Link href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+              <LogoFondoukBeta height={28} />
             </Link>
           </div>
           <Link href="/tableau-de-bord"
