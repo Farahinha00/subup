@@ -90,7 +90,7 @@ export default function ResultatsClient({ diagnosticId, resultats, demandesExist
             </Link>
             <div style={{ width: 1, height: 18, background: '#E7E1D9' }} />
             <Link href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-              <LogoFondoukBeta height={28} />
+              <LogoFondoukBeta height={42} />
             </Link>
           </div>
           <Link href="/tableau-de-bord"
