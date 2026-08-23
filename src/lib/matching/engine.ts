@@ -105,7 +105,7 @@ export interface ResultatMatching {
 
 export function matcherDispositif(dispositif: Dispositif, reponses: Reponses): ResultatMatching {
   const enrichies = enrichirReponses(reponses)
-  const criteres = dispositif.regles.criteres
+  const criteres = Array.isArray(dispositif.regles?.criteres) ? dispositif.regles.criteres : []
 
   const ok: CritereResultat[] = []
   const manquants: CritereResultat[] = []

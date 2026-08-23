@@ -38,16 +38,6 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Route admin
-  if (pathname.startsWith('/admin')) {
-    if (!user) {
-      const url = request.nextUrl.clone()
-      url.pathname = '/connexion'
-      return NextResponse.redirect(url)
-    }
-    // La vérification du rôle admin se fait dans la page elle-même
-  }
-
   return supabaseResponse
 }
 

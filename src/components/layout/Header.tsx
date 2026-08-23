@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { LogoFondoukBeta } from '@/components/layout/LogoFondouk'
 
 function LogoIcon({ size = 32, onDark = false }: { size?: number; onDark?: boolean }) {
   return (
@@ -52,11 +53,10 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-pierre" style={{ background: 'rgba(250,248,245,0.92)', backdropFilter: 'blur(10px)' }}>
-      <div className="max-w-6xl mx-auto px-6 h-[60px] flex items-center justify-between">
+      <div className="max-w-6xl mx-auto px-6 h-[72px] flex items-center justify-between">
 
-        <Link href="/" className="flex items-center gap-2.5">
-          <LogoIcon size={32} />
-          <span className="font-grotesk font-bold text-[18px] text-ardoise tracking-tight">sub&apos;up</span>
+        <Link href="/" className="flex items-center">
+          <LogoFondoukBeta height={42} />
         </Link>
 
         <nav className="flex items-center gap-3 text-sm">

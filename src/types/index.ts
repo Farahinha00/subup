@@ -76,6 +76,32 @@ export interface Regles {
   criteres: Critere[]
 }
 
+// ── Parcours montage dossier ────────────────────────────────────────────────
+
+export interface ParcoursCheckItem {
+  id: string
+  title: string
+  detail: string
+  blocking: boolean
+}
+
+export interface ParcoursDoc {
+  id: string
+  name: string
+  tag: 'have' | 'obtain' | 'generate'
+}
+
+export interface ParcoursDepotStep {
+  id: string
+  title: string
+  description: string
+  tip?: string
+  actionLabel?: string
+  actionHref?: string
+}
+
+// ── Dispositif ──────────────────────────────────────────────────────────────
+
 export interface Dispositif {
   id: string
   slug: string
@@ -102,6 +128,15 @@ export interface Dispositif {
   lien_officiel: string | null
   derniere_verification: string | null
   actif: boolean
+  // ── Parcours montage dossier ──
+  short_desc?: string | null
+  long_desc?: string | null
+  key_facts?: string[] | null
+  valid_criteria?: string[] | null
+  check_items?: ParcoursCheckItem[] | null
+  docs_parcours?: ParcoursDoc[] | null
+  depot_steps?: ParcoursDepotStep[] | null
+  last_verified_at?: string | null
 }
 
 // ---- Diagnostic — Maroc ----

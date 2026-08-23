@@ -126,7 +126,8 @@ function DiagnosticInner({ paysActifs, profileReponses }: {
     }
   }
 
-  function handleWizardClassique() { setMode('wizard'); setEtape(1) }
+  function goEtape(n: number) { setEtape(n); window.scrollTo({ top: 0, behavior: 'smooth' }) }
+  function handleWizardClassique() { setMode('wizard'); goEtape(1) }
 
   function handleRecapContinuer() {
     const champs = getChampsAPoser(reponses)
@@ -147,7 +148,10 @@ function DiagnosticInner({ paysActifs, profileReponses }: {
     const supabase = createClient()
     const nbQuestionsAI = mode === 'titre' ? champsAPoser.length : undefined
 
-    let titreFinal = titre.trim()
+    const userTitre = titre.trim()
+    let titreFinal = userTitre
+
+    // Si pas de titre user, on essaie l'IA
     if (!titreFinal) {
       try {
         const res = await fetch('/api/titre-diagnostic', {
@@ -159,6 +163,39 @@ function DiagnosticInner({ paysActifs, profileReponses }: {
           titreFinal = data.titre ?? ''
         }
       } catch {}
+    }
+
+    // Fallback : date du jour avec incrément si déjà pris
+    if (!titreFinal) {
+      const today = new Date()
+      const dateStr = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`
+      const { data: existing } = await supabase
+        .from('diagnostics')
+        .select('titre')
+        .eq('user_id', userId)
+        .ilike('titre', `${dateStr}%`)
+      const existingTitres = new Set((existing ?? []).map((d: { titre: string | null }) => d.titre))
+      if (!existingTitres.has(dateStr)) {
+        titreFinal = dateStr
+      } else {
+        let n = 2
+        while (existingTitres.has(`${dateStr} - ${n}`)) n++
+        titreFinal = `${dateStr} - ${n}`
+      }
+    }
+
+    // Si titre user et il existe déjà → avertir
+    if (userTitre) {
+      const { data: doublon } = await supabase
+        .from('diagnostics')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('titre', userTitre)
+        .limit(1)
+      if (doublon?.length) {
+        const continuer = window.confirm(`Le titre "${userTitre}" existe déjà. Continuer quand même ?`)
+        if (!continuer) { setLoading(false); return }
+      }
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -177,8 +214,15 @@ function DiagnosticInner({ paysActifs, profileReponses }: {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ diagnosticId: diagnostic.id }),
     })
-    if (res.ok) { localStorage.removeItem(STORAGE_KEY); router.push(`/resultats/${diagnostic.id}`) }
-    else setLoading(false)
+    if (res.ok) {
+      localStorage.removeItem(STORAGE_KEY)
+      router.push(`/resultats/${diagnostic.id}`)
+    } else {
+      const errData = await res.json().catch(() => ({})) as { error?: string }
+      console.error('[matching] erreur:', res.status, errData)
+      alert(`Erreur lors de l'analyse (${res.status}). Veuillez réessayer.`)
+      setLoading(false)
+    }
   }
 
   // ── Rendu ─────────────────────────────────────────────────────────────────
@@ -252,9 +296,9 @@ function DiagnosticInner({ paysActifs, profileReponses }: {
         {mode === 'wizard' && (
           <>
             <ProgressBar etape={etape} total={totalEtapes} />
-            {etape === 1 && <WizardEtape1 reponses={reponses} onChange={handleChange} onNext={() => setEtape(2)} />}
-            {etape === 2 && <WizardEtape2 reponses={reponses} onChange={handleChange} onNext={() => setEtape(3)} onBack={() => setEtape(1)} />}
-            {etape === 3 && <WizardEtape3 reponses={reponses} onChange={handleChange} onSubmit={() => setMode('titre')} onBack={() => setEtape(2)} loading={false} />}
+            {etape === 1 && <WizardEtape1 reponses={reponses} onChange={handleChange} onNext={() => goEtape(2)} />}
+            {etape === 2 && <WizardEtape2 reponses={reponses} onChange={handleChange} onNext={() => goEtape(3)} onBack={() => goEtape(1)} />}
+            {etape === 3 && <WizardEtape3 reponses={reponses} onChange={handleChange} onSubmit={() => setMode('titre')} onBack={() => goEtape(2)} loading={false} />}
           </>
         )}
 

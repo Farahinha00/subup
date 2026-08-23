@@ -8,5 +8,6 @@ export async function supprimerDiagnostic(diagnosticId: string) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Non authentifié')
   await supabase.from('diagnostics').delete().eq('id', diagnosticId).eq('user_id', user.id)
+  revalidatePath('/tableau-de-bord/diagnostics')
   revalidatePath('/tableau-de-bord')
 }
