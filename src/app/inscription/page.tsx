@@ -38,13 +38,17 @@ function InscriptionForm() {
     }
     const supabase = createClient()
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin
-    const { error: oauthError } = await supabase.auth.signInWithOAuth({
+    const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: `${siteUrl}/api/auth/callback?next=/tableau-de-bord` },
     })
     if (oauthError) {
       setError(`Google : ${oauthError.message}`)
       setLoadingGoogle(false)
+      return
+    }
+    if (data?.url) {
+      window.location.href = data.url
     }
   }
 
