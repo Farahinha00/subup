@@ -41,7 +41,10 @@ function InscriptionForm() {
     const siteUrl = raw.startsWith('http') ? raw : `https://${raw}`
     const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${siteUrl}/api/auth/callback?next=/tableau-de-bord` },
+      options: {
+        redirectTo: `${siteUrl}/api/auth/callback?next=/tableau-de-bord`,
+        queryParams: { prompt: 'select_account' },
+      },
     })
     if (oauthError) {
       setError(`Google : ${oauthError.message}`)
