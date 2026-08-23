@@ -37,7 +37,8 @@ function InscriptionForm() {
       localStorage.setItem('diagnostic_recovery_pending', '1')
     }
     const supabase = createClient()
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin
+    const raw = process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin
+    const siteUrl = raw.startsWith('http') ? raw : `https://${raw}`
     const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: `${siteUrl}/api/auth/callback?next=/tableau-de-bord` },

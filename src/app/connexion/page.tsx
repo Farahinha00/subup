@@ -38,7 +38,8 @@ function ConnexionForm() {
     }
     const supabase = createClient()
     const next = redirect ?? '/tableau-de-bord'
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin
+    const raw = process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin
+    const siteUrl = raw.startsWith('http') ? raw : `https://${raw}`
     const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: `${siteUrl}/api/auth/callback?next=${encodeURIComponent(next)}` },
