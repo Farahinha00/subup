@@ -39,10 +39,14 @@ function ConnexionForm() {
     const supabase = createClient()
     const next = redirect ?? '/tableau-de-bord'
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin
-    await supabase.auth.signInWithOAuth({
+    const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: `${siteUrl}/api/auth/callback?next=${encodeURIComponent(next)}` },
     })
+    if (oauthError) {
+      setError(`Google : ${oauthError.message}`)
+      setLoadingGoogle(false)
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
