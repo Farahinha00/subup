@@ -39,6 +39,25 @@ function isSectionTitle(line: string): boolean {
   return true
 }
 
+// Découpe une ligne en segments texte/gras pour rendre **...**
+function parseInline(line: string): React.ReactNode {
+  const parts = line.split(/(\*\*[\s\S]*?\*\*)/)
+  if (parts.length === 1) return line
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      const inner = part.slice(2, -2)
+      return <strong key={i} style={{ fontWeight: 700, color: '#221F1D' }}>{inner}</strong>
+    }
+    return part
+  })
+}
+
+// Ligne complète en gras = titre de section (ex : **Montant et Durée**)
+function isFullBold(line: string): boolean {
+  const t = line.trim()
+  return t.startsWith('**') && t.endsWith('**') && !t.slice(2, -2).includes('**')
+}
+
 function RichText({ text, baseStyle }: { text: string; baseStyle?: React.CSSProperties }) {
   const lines = text.split('\n')
   // regrouper en blocs séparés par lignes vides
@@ -57,7 +76,9 @@ function RichText({ text, baseStyle }: { text: string; baseStyle?: React.CSSProp
     <div style={{ fontSize: 14, color: '#4A453F', lineHeight: 1.75, ...baseStyle }}>
       {blocks.map((block, bi) => {
         const firstLine = block[0].trim()
-        const isTitle = isSectionTitle(firstLine)
+        // Titre : soit ligne sans ponctuation (structure CSV), soit ligne entièrement en **gras**
+        const isTitle = isSectionTitle(firstLine.replace(/\*\*/g, '')) || isFullBold(firstLine)
+        const titleText = firstLine.replace(/\*\*/g, '')
         const rest = isTitle ? block.slice(1) : block
 
         return (
@@ -68,11 +89,11 @@ function RichText({ text, baseStyle }: { text: string; baseStyle?: React.CSSProp
                 fontWeight: 700, fontSize: 13.5,
                 color: '#221F1D', marginBottom: 6, marginTop: bi > 0 ? 4 : 0,
               }}>
-                {firstLine}
+                {titleText}
               </div>
             )}
             {(isTitle ? rest : block).map((line, li) => (
-              <div key={li} style={{ lineHeight: 1.7 }}>{line.trim()}</div>
+              <div key={li} style={{ lineHeight: 1.7 }}>{parseInline(line.trim())}</div>
             ))}
           </div>
         )
