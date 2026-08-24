@@ -19,16 +19,69 @@ function GoogleIcon() {
   )
 }
 
+function getPasswordStrength(pwd: string) {
+  const checks = {
+    length: pwd.length >= 8,
+    uppercase: /[A-Z]/.test(pwd),
+    number: /[0-9]/.test(pwd),
+    special: /[^A-Za-z0-9]/.test(pwd),
+  }
+  const score = Object.values(checks).filter(Boolean).length
+  return { checks, score }
+}
+
+function PasswordStrength({ password }: { password: string }) {
+  if (!password) return null
+  const { checks, score } = getPasswordStrength(password)
+  const colors = ['#E7E1D9', '#E85D3B', '#F5A623', '#4CAF50', '#1F5A44']
+  const labels = ['', 'Faible', 'Moyen', 'Fort', 'Très fort']
+
+  return (
+    <div style={{ marginTop: 8 }}>
+      <div style={{ display: 'flex', gap: 4, marginBottom: 6 }}>
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} style={{
+            flex: 1, height: 4, borderRadius: 2,
+            background: score >= i ? colors[score] : '#E7E1D9',
+            transition: 'background 0.3s',
+          }} />
+        ))}
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+          {[
+            { ok: checks.length, label: '8 caractères' },
+            { ok: checks.uppercase, label: 'Majuscule' },
+            { ok: checks.number, label: 'Chiffre' },
+            { ok: checks.special, label: 'Symbole' },
+          ].map(({ ok, label }) => (
+            <span key={label} style={{ fontSize: 11, color: ok ? '#1F5A44' : '#9B948C', display: 'flex', alignItems: 'center', gap: 3 }}>
+              <span>{ok ? '✓' : '·'}</span> {label}
+            </span>
+          ))}
+        </div>
+        {score > 0 && (
+          <span style={{ fontSize: 11, fontWeight: 600, color: colors[score] }}>{labels[score]}</span>
+        )}
+      </div>
+    </div>
+  )
+}
+
 function InscriptionForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const fromDiagnostic = searchParams.get('from') === 'diagnostic'
 
-  const [form, setForm] = useState({ prenom: '', nom: '', email: '', motdepasse: '', entreprise: '', ville: '' })
+  const [form, setForm] = useState({ prenom: '', nom: '', email: '', motdepasse: '', motdepasseConfirm: '', entreprise: '', ville: '' })
   const [loading, setLoading] = useState(false)
   const [loadingGoogle, setLoadingGoogle] = useState(false)
   const [error, setError] = useState('')
   const [confirmationEnvoyee, setConfirmationEnvoyee] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+
+  const passwordMismatch = form.motdepasseConfirm.length > 0 && form.motdepasse !== form.motdepasseConfirm
+  const { score } = getPasswordStrength(form.motdepasse)
 
   async function handleGoogleSignIn() {
     setLoadingGoogle(true)
@@ -58,6 +111,14 @@ function InscriptionForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    if (form.motdepasse !== form.motdepasseConfirm) {
+      setError('Les mots de passe ne correspondent pas.')
+      return
+    }
+    if (score < 2) {
+      setError('Mot de passe trop faible. Ajoutez des majuscules, chiffres ou symboles.')
+      return
+    }
     setLoading(true)
     setError('')
 
@@ -107,13 +168,32 @@ function InscriptionForm() {
   if (confirmationEnvoyee) {
     return (
       <div className="max-w-md mx-auto px-4 py-16 text-center">
-        <div className="w-14 h-14 rounded-full bg-corail-pale flex items-center justify-center mx-auto mb-4 text-2xl">📧</div>
-        <h2 className="text-xl font-semibold text-ardoise mb-2">Vérifiez votre boîte mail</h2>
-        <p className="text-sm text-ardoise-clair mb-6">Un email de confirmation a été envoyé à <strong>{form.email}</strong>. Cliquez sur le lien pour activer votre compte.</p>
-        <div className="card bg-amber-50 border-amber-100 text-xs text-amber-700 text-left">
-          <strong>Pour désactiver la confirmation email</strong> (recommandé en dev) :<br />
-          Supabase → Authentication → Providers → Email → désactiver "Confirm email"
+        <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#F0F6F3', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: 26 }}>📧</div>
+        <h2 className="text-xl font-semibold text-ardoise mb-2">Confirmez votre email</h2>
+        <p className="text-sm text-ardoise-clair mb-2">
+          Un lien de confirmation a été envoyé à
+        </p>
+        <p className="text-sm font-semibold text-ardoise mb-6">{form.email}</p>
+        <div className="card text-left space-y-3 mb-6">
+          <p className="text-xs text-ardoise-clair font-medium uppercase tracking-wide">Comment procéder</p>
+          {[
+            '1. Ouvrez votre boîte mail',
+            '2. Cherchez un email de "Fondouk" ou "noreply@supabase.io"',
+            '3. Cliquez sur "Confirmer mon email"',
+            '4. Vous serez redirigé vers votre tableau de bord',
+          ].map((step) => (
+            <p key={step} className="text-sm text-ardoise">{step}</p>
+          ))}
         </div>
+        <p className="text-xs text-gray-400">
+          Pas reçu ? Vérifiez vos spams ou{' '}
+          <button
+            onClick={() => setConfirmationEnvoyee(false)}
+            className="text-corail font-medium hover:underline"
+          >
+            réessayez avec un autre email
+          </button>
+        </p>
       </div>
     )
   }
@@ -155,14 +235,58 @@ function InscriptionForm() {
           </div>
           <div><label className="label">Entreprise</label><input className="input" value={form.entreprise} onChange={(e) => setForm({ ...form, entreprise: e.target.value })} /></div>
           <div><label className="label">Ville</label><input className="input" value={form.ville} onChange={(e) => setForm({ ...form, ville: e.target.value })} /></div>
-          <div><label className="label">Email</label><input className="input" type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
+          <div><label className="label">Email</label><input className="input" type="email" required autoComplete="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
+
           <div>
             <label className="label">Mot de passe</label>
-            <input className="input" type="password" required minLength={8} value={form.motdepasse} onChange={(e) => setForm({ ...form, motdepasse: e.target.value })} />
-            <p className="text-xs text-gray-400 mt-1">Minimum 8 caractères</p>
+            <div style={{ position: 'relative' }}>
+              <input
+                className="input"
+                type={showPassword ? 'text' : 'password'}
+                required
+                minLength={8}
+                autoComplete="new-password"
+                value={form.motdepasse}
+                onChange={(e) => setForm({ ...form, motdepasse: e.target.value })}
+                style={{ paddingRight: 40 }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#9B948C', fontSize: 13 }}
+                tabIndex={-1}
+              >
+                {showPassword ? 'Cacher' : 'Voir'}
+              </button>
+            </div>
+            <PasswordStrength password={form.motdepasse} />
           </div>
+
+          <div>
+            <label className="label">Confirmer le mot de passe</label>
+            <input
+              className="input"
+              type={showPassword ? 'text' : 'password'}
+              required
+              autoComplete="new-password"
+              value={form.motdepasseConfirm}
+              onChange={(e) => setForm({ ...form, motdepasseConfirm: e.target.value })}
+              style={{ borderColor: passwordMismatch ? '#E85D3B' : undefined }}
+            />
+            {passwordMismatch && (
+              <p style={{ fontSize: 12, color: '#E85D3B', marginTop: 4 }}>Les mots de passe ne correspondent pas</p>
+            )}
+            {!passwordMismatch && form.motdepasseConfirm.length > 0 && (
+              <p style={{ fontSize: 12, color: '#1F5A44', marginTop: 4 }}>✓ Les mots de passe correspondent</p>
+            )}
+          </div>
+
           {error && <div className="bg-red-50 border border-red-100 text-red-600 text-xs rounded-xl p-3">{error}</div>}
-          <button type="submit" disabled={loading || loadingGoogle} className="w-full py-3 rounded-xl bg-corail hover:bg-corail-fonce text-white text-sm font-medium transition disabled:opacity-40">
+          <button
+            type="submit"
+            disabled={loading || loadingGoogle || passwordMismatch || score < 1}
+            className="w-full py-3 rounded-xl bg-corail hover:bg-corail-fonce text-white text-sm font-medium transition disabled:opacity-40"
+          >
             {loading ? 'Création...' : fromDiagnostic ? 'Créer mon compte et voir mes résultats →' : 'Créer mon compte →'}
           </button>
         </form>
