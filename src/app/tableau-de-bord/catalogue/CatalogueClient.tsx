@@ -102,6 +102,89 @@ function RichText({ text, baseStyle }: { text: string; baseStyle?: React.CSSProp
   )
 }
 
+// ── Fusion des critères de borne (min + max → plage) ───────────────────────
+// Ex : "CA annuel ≥ 1 M MAD" + "CA annuel < 200 M MAD" → "1 M MAD ≤ CA annuel < 200 M MAD"
+
+const LOWER_OPS = ['≥', '>']
+const UPPER_OPS = ['≤', '<']
+// Regex : sujet · opérateur · valeur · note optionnelle entre parenthèses
+const RANGE_RE = /^(.+?)\s*(≥|≤|>|<)\s*(.+?)(\s*\(.+\))?\s*$/
+
+interface ParsedC {
+  subject: string
+  op: string
+  valueStr: string
+  note: string
+  original: Critere
+}
+
+function parseC(c: Critere): ParsedC | null {
+  const m = c.label.match(RANGE_RE)
+  if (!m) return null
+  return {
+    subject: m[1].trim(),
+    op: m[2],
+    valueStr: m[3].trim(),
+    note: m[4] ? m[4].replace(/^\s*\(|\)\s*$/g, '').trim() : '',
+    original: c,
+  }
+}
+
+type MergedCritere =
+  | { kind: 'original'; c: Critere }
+  | { kind: 'merged'; label: string; note: string; bloquant: boolean }
+
+function mergeCriteria(criteres: Critere[]): MergedCritere[] {
+  const parsed: Array<{ p: ParsedC; used: boolean }> = []
+  const unparsed: Critere[] = []
+
+  for (const c of criteres) {
+    const p = parseC(c)
+    if (p) parsed.push({ p, used: false })
+    else unparsed.push(c)
+  }
+
+  const result: MergedCritere[] = []
+
+  for (let i = 0; i < parsed.length; i++) {
+    if (parsed[i].used) continue
+    const a = parsed[i].p
+    const aIsLower = LOWER_OPS.includes(a.op)
+    const aIsUpper = UPPER_OPS.includes(a.op)
+
+    let partner = -1
+    for (let j = i + 1; j < parsed.length; j++) {
+      if (parsed[j].used) continue
+      const b = parsed[j].p
+      if (b.subject !== a.subject) continue
+      const bIsLower = LOWER_OPS.includes(b.op)
+      const bIsUpper = UPPER_OPS.includes(b.op)
+      if ((aIsLower && bIsUpper) || (aIsUpper && bIsLower)) { partner = j; break }
+    }
+
+    if (partner >= 0) {
+      parsed[i].used = true
+      parsed[partner].used = true
+      const b = parsed[partner].p
+      const lo = aIsLower ? a : b
+      const hi = aIsLower ? b : a
+      const label = `${lo.valueStr} ${lo.op} ${a.subject} ${hi.op} ${hi.valueStr}`
+      const notes = [lo.note, hi.note].filter(Boolean)
+      result.push({
+        kind: 'merged',
+        label,
+        note: notes.join(' · '),
+        bloquant: a.original.bloquant || b.original.bloquant,
+      })
+    } else {
+      result.push({ kind: 'original', c: a.original })
+    }
+  }
+
+  for (const c of unparsed) result.push({ kind: 'original', c })
+  return result
+}
+
 // ── style tokens ───────────────────────────────────────────────────────────
 
 const BADGE_PROCHAINEMENT: React.CSSProperties = {
@@ -204,18 +287,29 @@ function FicheComplete({ d }: { d: Dispositif }) {
                 Critères d&apos;éligibilité
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-                {criteres.map((c) => (
-                  <div key={c.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 7, padding: '6px 10px', border: '1px solid #E7E1D9', borderRadius: 8 }}>
-                    <span style={{
-                      fontSize: 10.5, fontWeight: 700, padding: '2px 6px', borderRadius: 6, flexShrink: 0, marginTop: 1,
-                      background: c.bloquant ? '#FFF6EF' : '#F1EEE9',
-                      color: c.bloquant ? '#B8552A' : '#8A8378',
-                    }}>
-                      {c.bloquant ? 'Bloquant' : 'Critère'}
-                    </span>
-                    <span style={{ fontSize: 13, color: '#4A453F', lineHeight: 1.5 }}>{c.label}</span>
-                  </div>
-                ))}
+                {mergeCriteria(criteres).map((item, idx) => {
+                  const bloquant = item.kind === 'original' ? item.c.bloquant : item.bloquant
+                  const label = item.kind === 'original' ? item.c.label : item.label
+                  const note = item.kind === 'merged' ? item.note : ''
+                  const key = item.kind === 'original' ? item.c.id : `merged-${idx}`
+                  return (
+                    <div key={key} style={{ display: 'flex', alignItems: 'flex-start', gap: 7, padding: '6px 10px', border: '1px solid #E7E1D9', borderRadius: 8 }}>
+                      <span style={{
+                        fontSize: 10.5, fontWeight: 700, padding: '2px 6px', borderRadius: 6, flexShrink: 0, marginTop: 1,
+                        background: bloquant ? '#FFF6EF' : '#F1EEE9',
+                        color: bloquant ? '#B8552A' : '#8A8378',
+                      }}>
+                        {bloquant ? 'Bloquant' : 'Critère'}
+                      </span>
+                      <div>
+                        <span style={{ fontSize: 13, color: '#4A453F', lineHeight: 1.5 }}>{label}</span>
+                        {note && (
+                          <span style={{ fontSize: 11.5, color: '#8A8378', marginLeft: 6 }}>({note})</span>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
             </div>
           )}
