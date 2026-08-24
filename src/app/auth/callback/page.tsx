@@ -10,23 +10,27 @@ function CallbackHandler() {
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    const code = searchParams.get('code')
     const next = searchParams.get('next') ?? '/tableau-de-bord'
-
-    if (!code) {
-      router.replace('/connexion?error=no_code')
-      return
-    }
-
     const supabase = createClient()
-    supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
-      if (error) {
-        router.replace(`/connexion?error=${encodeURIComponent(error.message)}`)
-      } else {
+
+    // Implicit flow: tokens are in URL hash — Supabase detects them via onAuthStateChange
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        subscription.unsubscribe()
         router.replace(next)
       }
     })
-  }, [searchParams, router])
+
+    // Fallback: session already exists
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        subscription.unsubscribe()
+        router.replace(next)
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [router, searchParams])
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
