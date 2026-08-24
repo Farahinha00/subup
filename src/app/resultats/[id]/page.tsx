@@ -23,37 +23,14 @@ export default async function ResultatsPage({ params }: { params: Promise<{ id: 
     .eq('diagnostic_id', id)
     .order('score', { ascending: false })
 
-  const { data: demandes } = await supabase
-    .from('demandes_accompagnement')
-    .select('dispositif_id')
-    .eq('diagnostic_id', id)
-    .eq('user_id', user.id)
-
-  const { data: parcoursRows } = await supabase
-    .from('dossier_parcours')
-    .select('dispositif_id')
-    .eq('user_id', user.id)
-    .eq('unlocked', true)
-
-  const { data: creditsRow } = await supabase
-    .from('credits')
-    .select('solde')
-    .eq('user_id', user.id)
-    .single()
-
-  const demandesSet = new Set((demandes ?? []).map((d) => d.dispositif_id))
-  const dispositifsDebloques = new Set((parcoursRows ?? []).map((p) => p.dispositif_id))
   const nomEntreprise = profile?.entreprise ?? profile?.prenom ?? user.email?.split('@')[0] ?? 'Mon entreprise'
 
   return (
     <ResultatsClient
       diagnosticId={id}
       resultats={(resultats ?? []) as Resultat[]}
-      demandesExistantes={demandesSet}
-      dispositifsDebloques={dispositifsDebloques}
       pays={diagnostic.pays ?? 'MA'}
       nomEntreprise={nomEntreprise}
-      soldeInitial={creditsRow?.solde ?? 0}
     />
   )
 }

@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
-import { LogoFondoukBeta } from '@/components/layout/LogoFondouk'
+import { Logo } from '@/components/layout/LogoFondouk'
 import CarteDispositif from '@/components/resultats/CarteDispositif'
 import type { Resultat, Pays } from '@/types'
 import { LABELS, ORDRE_CATEGORIES } from '@/lib/labels'
@@ -11,38 +11,31 @@ import { createClient } from '@/lib/supabase/client'
 interface Props {
   diagnosticId: string
   resultats: Resultat[]
-  demandesExistantes: Set<string>
-  dispositifsDebloques: Set<string>
   pays?: Pays
   nomEntreprise?: string
-  soldeInitial?: number
+}
+
+const BADGE_PROCHAINEMENT: React.CSSProperties = {
+  fontFamily: "'Inter', sans-serif",
+  fontWeight: 700,
+  fontSize: 11.5,
+  letterSpacing: '0.04em',
+  textTransform: 'uppercase',
+  background: '#fff',
+  border: '1px solid #E7E1D9',
+  borderRadius: 100,
+  padding: '3px 8px',
+  color: '#8A8378',
 }
 
 export default function ResultatsClient({
-  diagnosticId, resultats, demandesExistantes, dispositifsDebloques,
-  pays = 'MA', nomEntreprise, soldeInitial = 0,
+  diagnosticId, resultats,
+  pays = 'MA', nomEntreprise,
 }: Props) {
-  const [demandes] = useState<Set<string>>(demandesExistantes)
   const [filtreActif, setFiltreActif] = useState<'accessibles' | 'tous'>('accessibles')
-  const [isBeta, setIsBeta] = useState(false)
-  const [solde, setSolde] = useState(soldeInitial)
-
-  useEffect(() => {
-    const checkBeta = () => setIsBeta(window.location.hash === '#versionBeta')
-    checkBeta()
-    window.addEventListener('hashchange', checkBeta)
-    return () => window.removeEventListener('hashchange', checkBeta)
-  }, [])
-
-  useEffect(() => {
-    if (!isBeta) return
-    const supabase = createClient()
-    supabase.auth.getUser().then(async ({ data: { user } }) => {
-      if (!user) return
-      const { data } = await supabase.from('credits').select('solde').eq('user_id', user.id).single()
-      if (data) setSolde(data.solde)
-    })
-  }, [isBeta])
+  const [waitlistEmail, setWaitlistEmail] = useState('')
+  const [waitlistSent, setWaitlistSent] = useState(false)
+  const [waitlistLoading, setWaitlistLoading] = useState(false)
 
   const eligibles = resultats.filter((r) => r.statut !== 'non_eligible')
   const resultatsAffiches = filtreActif === 'accessibles'
@@ -54,7 +47,6 @@ export default function ResultatsClient({
     return sum
   }, 0)
 
-  // Groupes par catégorie
   const groupes: Array<{ categorie: string; label: string; items: Resultat[] }> = []
   const sansCategorie: Resultat[] = []
   const map = new Map<string, Resultat[]>()
@@ -79,6 +71,21 @@ export default function ResultatsClient({
     return `${v} ${devise}`
   }
 
+  async function handleWaitlist(e: React.FormEvent) {
+    e.preventDefault()
+    if (!waitlistEmail) return
+    setWaitlistLoading(true)
+    try {
+      const supabase = createClient()
+      await supabase.from('waitlist_entries').insert({ email: waitlistEmail, source: 'resultats' })
+      setWaitlistSent(true)
+    } catch {
+      setWaitlistSent(true)
+    } finally {
+      setWaitlistLoading(false)
+    }
+  }
+
   return (
     <div style={{ fontFamily: "'Inter', sans-serif", background: '#FAF8F5', color: '#221F1D', minHeight: '100vh' }}>
 
@@ -95,24 +102,18 @@ export default function ResultatsClient({
             </Link>
             <div style={{ width: 1, height: 18, background: '#E7E1D9' }} />
             <Link href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-              <LogoFondoukBeta height={42} />
+              <Logo size="nav" variant="beta" />
             </Link>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            {isBeta && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#4A453F' }}>
-                  <span style={{ color: '#1F5A44', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700 }}>{solde}</span> crédit{solde !== 1 ? 's' : ''}
-                </div>
-                <Link href="/recharger"
-                  style={{ fontSize: 12.5, fontWeight: 700, background: '#F1EEE9', color: '#221F1D', borderRadius: 8, padding: '6px 12px', textDecoration: 'none' }}>
-                  Recharger
-                </Link>
-              </div>
-            )}
-            <Link href="/tableau-de-bord"
-              style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 14, background: '#1F5A44', color: '#FAF8F5', borderRadius: 9, padding: '10px 20px', textDecoration: 'none' }}>
-              Mon tableau de bord →
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            {/* Crédits dossier — Prochainement */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', border: '1px dashed #C9BFAE', borderRadius: 100 }}>
+              <span style={{ fontSize: 13, color: '#8A8378', fontWeight: 500 }}>Crédits dossier</span>
+              <span style={BADGE_PROCHAINEMENT}>PROCHAINEMENT</span>
+            </div>
+            <Link href="/tableau-de-bord/catalogue"
+              style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 13.5, background: '#F1EEE9', color: '#4A453F', borderRadius: 9, padding: '9px 18px', textDecoration: 'none' }}>
+              Catalogue
             </Link>
           </div>
         </div>
@@ -122,23 +123,18 @@ export default function ResultatsClient({
 
         {/* ── En-tête ── */}
         <div style={{ marginBottom: 36 }}>
-          {isBeta && (
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#F1EEE9', border: '1px solid #E7E1D9', borderRadius: 100, padding: '4px 12px', fontSize: 12, fontWeight: 700, color: '#6B6560', marginBottom: 12, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-              Version gratuite
-            </div>
-          )}
-          <div style={{ fontSize: 13, fontWeight: 600, color: '#8A8378', marginBottom: 8 }}>Diagnostic d&apos;éligibilité</div>
-          <h1 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 30, letterSpacing: '-0.01em', margin: 0 }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#F1EEE9', border: '1px solid #E7E1D9', borderRadius: 100, padding: '4px 12px', fontSize: 12, fontWeight: 700, color: '#6B6560', marginBottom: 12, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+            Version gratuite
+          </div>
+          <h1 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 30, letterSpacing: '-0.01em', margin: '0 0 8px' }}>
             {eligibles.length} dispositif{eligibles.length > 1 ? 's' : ''} pour {nomEntreprise}
           </h1>
-          {isBeta && (
-            <p style={{ fontSize: 14, color: '#6B6560', marginTop: 10, lineHeight: 1.6 }}>
-              Voici les aides publiques auxquelles votre profil est éligible. Débloquez un dossier guidé pour chaque dispositif que vous souhaitez monter.
-            </p>
-          )}
+          <p style={{ fontSize: 14, color: '#6B6560', margin: 0, lineHeight: 1.6 }}>
+            Voici les aides auxquelles vous êtes éligible, avec l&apos;essentiel à savoir. Le montage de dossier accompagné arrive prochainement.
+          </p>
         </div>
 
-        {/* ── Filtre ── */}
+        {/* ── Filtres ── */}
         <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
           {(['accessibles', 'tous'] as const).map((f) => (
             <button key={f} onClick={() => setFiltreActif(f)}
@@ -184,7 +180,7 @@ export default function ResultatsClient({
                 </div>
                 {categorie === 'financement_garantie' && (
                   <div style={{ background: '#EAF3EE', border: '1px solid #C0DAC9', borderRadius: 12, padding: '12px 16px', marginBottom: 14, fontSize: 13, color: '#1F5A44' }}>
-                    <strong>Tamwilcom ne prête pas directement :</strong> la demande passe par votre banque, l'État garantit une partie du crédit.
+                    <strong>Tamwilcom ne prête pas directement :</strong> la demande passe par votre banque, l&apos;État garantit une partie du crédit.
                   </div>
                 )}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -192,9 +188,6 @@ export default function ResultatsClient({
                     <CarteDispositif
                       key={r.id}
                       resultat={r}
-                      isBeta={isBeta}
-                      solde={solde}
-                      dispositifDebloque={dispositifsDebloques.has(r.dispositif_id)}
                       diagnosticId={diagnosticId}
                     />
                   ))}
@@ -207,9 +200,6 @@ export default function ResultatsClient({
                   <CarteDispositif
                     key={r.id}
                     resultat={r}
-                    isBeta={isBeta}
-                    solde={solde}
-                    dispositifDebloque={dispositifsDebloques.has(r.dispositif_id)}
                     diagnosticId={diagnosticId}
                   />
                 ))}
@@ -222,9 +212,6 @@ export default function ResultatsClient({
               <CarteDispositif
                 key={r.id}
                 resultat={r}
-                isBeta={isBeta}
-                solde={solde}
-                dispositifDebloque={dispositifsDebloques.has(r.dispositif_id)}
                 diagnosticId={diagnosticId}
               />
             ))}
@@ -246,32 +233,58 @@ export default function ResultatsClient({
           </div>
         )}
 
-        {/* ── Encart "Ce que débloque un crédit" (beta only) ── */}
-        {isBeta && eligibles.length > 0 && (
-          <div style={{ marginTop: 48, border: '2px dashed #C9BFAE', borderRadius: 16, padding: '28px 32px' }}>
-            <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 16, marginBottom: 16 }}>
-              Ce que débloque 1 crédit
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {[
-                'Vérification guidée de votre éligibilité, critère par critère',
-                'Liste personnalisée des documents à préparer',
-                'Parcours de dépôt étape par étape avec conseils pratiques',
-                'Dossier complet à télécharger, accessible indéfiniment',
-              ].map((item, i) => (
-                <div key={i} style={{ display: 'flex', gap: 10, fontSize: 14, color: '#4A453F', lineHeight: 1.5 }}>
-                  <span style={{ color: '#1F5A44', fontWeight: 700, flexShrink: 0 }}>✓</span>{item}
-                </div>
-              ))}
-            </div>
-            <div style={{ marginTop: 20, fontSize: 13, color: '#8A8378', fontWeight: 600 }}>
-              1 crédit · dossier · accessible sans limite de temps
+        {/* ── Encart waitlist ── */}
+        <div style={{ marginTop: 56, border: '2px dashed #C9BFAE', borderRadius: 18, padding: '32px 36px' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 24, flexWrap: 'wrap', marginBottom: 20 }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 17 }}>
+                  Le montage de dossier accompagné
+                </span>
+                <span style={BADGE_PROCHAINEMENT}>PROCHAINEMENT</span>
+              </div>
+              <p style={{ fontSize: 14, color: '#6B6560', lineHeight: 1.7, margin: 0, maxWidth: 520 }}>
+                Vérification guidée de votre éligibilité, liste personnalisée des pièces à préparer, parcours de dépôt étape par étape avec conseils pratiques, et dossier complet téléchargeable.
+              </p>
             </div>
           </div>
-        )}
 
-        <p style={{ fontSize: 12, color: '#8A8378', textAlign: 'center', marginTop: 48 }}>
-          Ces résultats sont indicatifs. Vérifiez votre éligibilité définitive auprès des organismes concernés. Dernière vérification : juin 2026.
+          {waitlistSent ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: '#1F5A44', fontWeight: 600 }}>
+              <span>✓</span> Vous serez prévenu au lancement. Merci !
+            </div>
+          ) : (
+            <form onSubmit={handleWaitlist} style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              <input
+                type="email"
+                required
+                placeholder="votre@email.ma"
+                value={waitlistEmail}
+                onChange={(e) => setWaitlistEmail(e.target.value)}
+                style={{
+                  flex: 1, minWidth: 240,
+                  fontSize: 14, padding: '11px 16px', borderRadius: 10,
+                  border: '1px solid #E7E1D9', background: '#fff', color: '#221F1D', outline: 'none',
+                }}
+              />
+              <button
+                type="submit"
+                disabled={waitlistLoading}
+                style={{
+                  fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 14,
+                  padding: '11px 20px', borderRadius: 10,
+                  border: '1.5px solid #1F5A44', background: 'transparent', color: '#1F5A44',
+                  cursor: 'pointer', whiteSpace: 'nowrap',
+                }}
+              >
+                {waitlistLoading ? 'Envoi...' : 'Être prévenu au lancement'}
+              </button>
+            </form>
+          )}
+        </div>
+
+        <p style={{ fontSize: 12, color: '#8A8378', textAlign: 'center', marginTop: 40 }}>
+          Ces résultats sont indicatifs. Vérifiez votre éligibilité définitive auprès des organismes concernés. Dernière vérification : août 2026.
         </p>
       </div>
     </div>
