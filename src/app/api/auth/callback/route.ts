@@ -30,7 +30,10 @@ export async function GET(request: NextRequest) {
     if (!error) {
       return redirectResponse
     }
+    console.error('[callback] exchangeCodeForSession error:', error.message, error.status)
+    console.log('[callback] cookies reçus:', request.cookies.getAll().map(c => c.name))
+    return NextResponse.redirect(`${origin}/connexion?error=${encodeURIComponent(error.message)}`)
   }
 
-  return NextResponse.redirect(`${origin}/connexion?error=callback`)
+  return NextResponse.redirect(`${origin}/connexion?error=no_code`)
 }
