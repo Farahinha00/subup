@@ -42,7 +42,7 @@ function InscriptionForm() {
     const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${siteUrl}/api/auth/callback?next=/tableau-de-bord`,
+        redirectTo: `${siteUrl}/auth/callback?next=/tableau-de-bord`,
         queryParams: { prompt: 'select_account' },
       },
     })
@@ -66,7 +66,7 @@ function InscriptionForm() {
       email: form.email,
       password: form.motdepasse,
       options: {
-        emailRedirectTo: `${window.location.origin}/api/auth/callback`,
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
         data: { prenom: form.prenom, nom: form.nom, entreprise: form.entreprise, ville: form.ville },
       },
     })

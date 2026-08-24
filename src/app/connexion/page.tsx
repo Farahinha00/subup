@@ -43,7 +43,7 @@ function ConnexionForm() {
     const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${siteUrl}/api/auth/callback?next=${encodeURIComponent(next)}`,
+        redirectTo: `${siteUrl}/auth/callback?next=${encodeURIComponent(next)}`,
         queryParams: { prompt: 'select_account' },
       },
     })
