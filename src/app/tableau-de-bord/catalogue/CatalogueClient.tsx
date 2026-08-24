@@ -26,6 +26,61 @@ function formatDate(dateStr: string | null | undefined) {
   }
 }
 
+// ── RichText — préserve titres de section et sauts de ligne du CSV ─────────
+// Règle de détection titre : ligne courte, sans ponctuation finale, commence
+// par une majuscule ou une lettre accentuée majuscule.
+function isSectionTitle(line: string): boolean {
+  const t = line.trim()
+  if (!t || t.length > 80) return false
+  if (/[.,;:]$/.test(t)) return false           // se termine par ponctuation → contenu
+  if (/^[-•*]/.test(t)) return false            // bullet → contenu
+  if (/^\d+[).]\s/.test(t)) return false        // "1) ..." → contenu numéroté
+  if (/^[a-zàâäéèêëîïôöùûüç]/.test(t)) return false  // minuscule → contenu
+  return true
+}
+
+function RichText({ text, baseStyle }: { text: string; baseStyle?: React.CSSProperties }) {
+  const lines = text.split('\n')
+  // regrouper en blocs séparés par lignes vides
+  const blocks: string[][] = []
+  let cur: string[] = []
+  for (const l of lines) {
+    if (l.trim() === '') {
+      if (cur.length) { blocks.push(cur); cur = [] }
+    } else {
+      cur.push(l)
+    }
+  }
+  if (cur.length) blocks.push(cur)
+
+  return (
+    <div style={{ fontSize: 14, color: '#4A453F', lineHeight: 1.75, ...baseStyle }}>
+      {blocks.map((block, bi) => {
+        const firstLine = block[0].trim()
+        const isTitle = isSectionTitle(firstLine)
+        const rest = isTitle ? block.slice(1) : block
+
+        return (
+          <div key={bi} style={{ marginBottom: bi < blocks.length - 1 ? 14 : 0 }}>
+            {isTitle && (
+              <div style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontWeight: 700, fontSize: 13.5,
+                color: '#221F1D', marginBottom: 6, marginTop: bi > 0 ? 4 : 0,
+              }}>
+                {firstLine}
+              </div>
+            )}
+            {(isTitle ? rest : block).map((line, li) => (
+              <div key={li} style={{ lineHeight: 1.7 }}>{line.trim()}</div>
+            ))}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 // ── style tokens ───────────────────────────────────────────────────────────
 
 const BADGE_PROCHAINEMENT: React.CSSProperties = {
@@ -96,7 +151,7 @@ function FicheComplete({ d }: { d: Dispositif }) {
           <div style={{ fontSize: 12, fontWeight: 700, color: '#4A453F', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 10 }}>
             En quoi ça consiste
           </div>
-          <p style={{ fontSize: 14, color: '#4A453F', lineHeight: 1.75, margin: 0 }}>{d.long_desc}</p>
+          <RichText text={d.long_desc} />
         </div>
       )}
 
