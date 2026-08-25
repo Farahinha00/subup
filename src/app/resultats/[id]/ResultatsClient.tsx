@@ -91,7 +91,7 @@ export default function ResultatsClient({
 
       {/* ── Topbar sticky ── */}
       <div style={{
-        position: 'sticky', top: 0, zIndex: 10,
+        position: 'sticky', top: 'var(--banner-h, 0px)', zIndex: 10,
         background: 'rgba(250,248,245,0.92)', backdropFilter: 'blur(10px)',
         borderBottom: '1px solid #E7E1D9',
       }}>

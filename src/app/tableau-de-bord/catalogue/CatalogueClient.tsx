@@ -516,7 +516,7 @@ function CatalogueContent({ dispositifs }: { dispositifs: Dispositif[] }) {
 
       <div
         className="catalogue-shell"
-        style={{ padding: '20px 24px', height: '100%', minHeight: 700, display: 'flex', flexDirection: 'column' }}
+        style={{ padding: '20px 24px', flex: 1, minHeight: 620, display: 'flex', flexDirection: 'column' }}
       >
         {/* En-tête compact */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 20, flexWrap: 'wrap', marginBottom: 14, flexShrink: 0 }}>

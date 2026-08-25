@@ -24,7 +24,7 @@ function LogoIcon({ size = 32, onDark = false }: { size?: number; onDark?: boole
 
 export { LogoIcon }
 
-const SIDEBAR_ROUTES = ['/tableau-de-bord', '/resultats']
+const SIDEBAR_ROUTES = ['/tableau-de-bord', '/resultats', '/inscription']
 
 export default function Header() {
   const pathname = usePathname()
@@ -52,7 +52,7 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-pierre" style={{ background: 'rgba(250,248,245,0.92)', backdropFilter: 'blur(10px)' }}>
+    <header className="border-b border-pierre" style={{ background: 'rgba(250,248,245,0.92)', backdropFilter: 'blur(10px)' }}>
       <div className="max-w-6xl mx-auto px-6 h-[72px] flex items-center justify-between">
 
         <Link href="/" className="flex items-center">
@@ -71,9 +71,17 @@ export default function Header() {
                 </button>
               </>
             ) : (
-              <Link href="/connexion" className="text-ardoise-moyen hover:text-ardoise transition font-medium hidden sm:block">
-                Connexion
-              </Link>
+              <>
+                <Link href="/connexion" className="text-ardoise-moyen hover:text-ardoise transition font-medium hidden sm:block">
+                  Connexion
+                </Link>
+                <Link
+                  href="/inscription"
+                  style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 13.5, background: '#1F5A44', color: '#FAF8F5', borderRadius: 9, padding: '9px 16px', textDecoration: 'none', whiteSpace: 'nowrap' }}
+                >
+                  Créer un compte
+                </Link>
+              </>
             )
           )}
           <Link href="/diagnostic" className="btn-vert px-4 py-2 text-[13.5px]">

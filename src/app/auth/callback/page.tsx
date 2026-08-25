@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Suspense } from 'react'
+import type { Session } from '@supabase/supabase-js'
 
 function CallbackHandler() {
   const router = useRouter()
@@ -12,21 +13,35 @@ function CallbackHandler() {
   useEffect(() => {
     const next = searchParams.get('next') ?? '/tableau-de-bord'
     const supabase = createClient()
+    let handled = false
 
-    // Implicit flow: tokens are in URL hash — Supabase detects them via onAuthStateChange
+    async function handleSession(session: Session) {
+      if (handled) return
+      handled = true
+      subscription.unsubscribe()
+
+      // Check if user has completed onboarding (new column added in v4 migration)
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('onboarding_completed_at')
+        .eq('id', session.user.id)
+        .single()
+
+      if (!profile?.onboarding_completed_at) {
+        router.replace('/inscription?step=profile&from=google')
+      } else {
+        router.replace(next)
+      }
+    }
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        subscription.unsubscribe()
-        router.replace(next)
+        handleSession(session)
       }
     })
 
-    // Fallback: session already exists
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        subscription.unsubscribe()
-        router.replace(next)
-      }
+      if (session) handleSession(session)
     })
 
     return () => subscription.unsubscribe()

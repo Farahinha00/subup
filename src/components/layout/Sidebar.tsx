@@ -36,7 +36,7 @@ export default function Sidebar() {
   return (
     <aside
       className="w-[240px] flex-shrink-0 flex flex-col"
-      style={{ backgroundColor: 'var(--vert)', height: '100vh', overflow: 'hidden' }}
+      style={{ backgroundColor: 'var(--vert)', height: '100%', overflow: 'hidden' }}
     >
       {/* Logo */}
       <div className="px-5 pt-5 pb-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', flexShrink: 0 }}>
