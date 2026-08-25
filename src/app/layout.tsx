@@ -3,6 +3,7 @@ import './globals.css'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import BetaBanner from '@/components/layout/BetaBanner'
+import { Analytics } from '@vercel/analytics/next'
 
 const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://fondouk.ma'
 
@@ -41,6 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </div>
         <main className="flex-1 flex flex-col min-h-0">{children}</main>
         <Footer />
+        <Analytics />
       </body>
     </html>
   )
