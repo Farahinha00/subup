@@ -72,14 +72,6 @@ export default async function LandingPage() {
             </div>
           )}
 
-          <div className="flex gap-9">
-            {[{ value: nbLabel, label: 'dispositifs' }, { value: '3 200', label: 'entreprises' }, { value: '840M MAD', label: 'financés' }].map((s) => (
-              <div key={s.label}>
-                <div className="font-grotesk font-bold text-[24px] text-ardoise">{s.value}</div>
-                <div className="text-[12px] text-ardoise-clair mt-0.5">{s.label}</div>
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* Preview card */}
