@@ -168,7 +168,9 @@ function mergeCriteria(criteres: Critere[]): MergedCritere[] {
       const b = parsed[partner].p
       const lo = aIsLower ? a : b
       const hi = aIsLower ? b : a
-      const label = `${lo.valueStr} ${lo.op} ${a.subject} ${hi.op} ${hi.valueStr}`
+      // Retourner l'opérateur de la borne basse : ≥ → ≤, > → <
+      const flipOp = (op: string) => op === '≥' ? '≤' : op === '>' ? '<' : op === '≤' ? '≥' : '>'
+      const label = `${lo.valueStr} ${flipOp(lo.op)} ${a.subject} ${hi.op} ${hi.valueStr}`
       const notes = [lo.note, hi.note].filter(Boolean)
       result.push({
         kind: 'merged',
