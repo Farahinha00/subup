@@ -84,7 +84,7 @@ export default function BetaBanner() {
         <div style={{
           maxWidth: 1320, margin: '0 auto', padding: '10px 32px',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          gap: 12, flexWrap: 'nowrap', whiteSpace: 'nowrap', overflow: 'hidden',
+          gap: 12, flexWrap: 'nowrap',
         }}>
           <span style={{
             background: '#E2703A', color: '#221F1D', fontSize: 11, fontWeight: 700,
@@ -93,7 +93,7 @@ export default function BetaBanner() {
           }}>
             Version bêta
           </span>
-          <span style={{ fontSize: 13.5, color: '#D8D2C8', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <span style={{ fontSize: 13.5, color: '#D8D2C8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
             Fondouk est en cours de développement — certaines informations peuvent être incomplètes.
           </span>
           <button

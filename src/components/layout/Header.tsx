@@ -84,9 +84,6 @@ export default function Header() {
               </>
             )
           )}
-          <Link href="/diagnostic" className="btn-vert px-4 py-2 text-[13.5px]">
-            Démarrer
-          </Link>
         </nav>
       </div>
     </header>
