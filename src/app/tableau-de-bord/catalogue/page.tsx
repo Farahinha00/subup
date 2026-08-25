@@ -12,12 +12,7 @@ export default async function CataloguePage() {
     .from('dispositifs')
     .select('*')
     .eq('actif', true)
-    .eq('pays', 'MA')
     .order('nom')
 
-  return (
-    <div style={{ maxWidth: 960, margin: '0 auto', padding: '40px 32px 80px' }}>
-      <CatalogueClient dispositifs={(dispositifs ?? []) as Dispositif[]} />
-    </div>
-  )
+  return <CatalogueClient dispositifs={(dispositifs ?? []) as Dispositif[]} />
 }

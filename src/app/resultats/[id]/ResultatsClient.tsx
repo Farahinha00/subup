@@ -130,7 +130,7 @@ export default function ResultatsClient({
             {eligibles.length} dispositif{eligibles.length > 1 ? 's' : ''} pour {nomEntreprise}
           </h1>
           <p style={{ fontSize: 14, color: '#6B6560', margin: 0, lineHeight: 1.6 }}>
-            Voici les aides auxquelles vous êtes éligible, avec l&apos;essentiel à savoir. Le montage de dossier accompagné arrive prochainement.
+            Voici les aides auxquelles vous êtes éligible, avec l&apos;essentiel à savoir. Le montage de dossier arrive prochainement.
           </p>
         </div>
 
@@ -239,12 +239,12 @@ export default function ResultatsClient({
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                 <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 17 }}>
-                  Le montage de dossier accompagné
+                  Le montage de dossier
                 </span>
                 <span style={BADGE_PROCHAINEMENT}>PROCHAINEMENT</span>
               </div>
               <p style={{ fontSize: 14, color: '#6B6560', lineHeight: 1.7, margin: 0, maxWidth: 520 }}>
-                Vérification guidée de votre éligibilité, liste personnalisée des pièces à préparer, parcours de dépôt étape par étape avec conseils pratiques, et dossier complet téléchargeable.
+                Vérification des critères bloquants, liste nominative des pièces, modèles pré-remplis à télécharger et étapes de dépôt commentées jusqu&apos;au décaissement — pour chacun de vos dispositifs.
               </p>
             </div>
           </div>
