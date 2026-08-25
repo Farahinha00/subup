@@ -31,7 +31,7 @@ export default async function LandingPage() {
     <div className="bg-fond">
 
       {/* ── HERO ──────────────────────────────────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-6 pt-20 pb-16 grid lg:grid-cols-[1.1fr_0.9fr] gap-14 items-center">
+      <section className="max-w-6xl mx-auto px-6 pt-10 pb-16 grid lg:grid-cols-[1.1fr_0.9fr] gap-14 items-center">
 
         {/* Texte */}
         <div>
