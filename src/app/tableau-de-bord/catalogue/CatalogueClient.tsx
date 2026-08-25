@@ -240,20 +240,24 @@ function TabCriteria({ d }: { d: Dispositif }) {
 }
 
 function TabDossier({ d }: { d: Dispositif }) {
-  const [waitlistEmail, setWaitlistEmail] = useState('')
   const [waitlistSent, setWaitlistSent] = useState(false)
   const [waitlistLoading, setWaitlistLoading] = useState(false)
 
   const docsCount = d.docs_parcours?.length ?? 0
   const stepsCount = d.depot_steps?.length ?? 0
 
-  async function handleWaitlist(e: React.FormEvent) {
-    e.preventDefault()
-    if (!waitlistEmail) return
+  async function handleWaitlist() {
     setWaitlistLoading(true)
     try {
       const supabase = createClient()
-      await supabase.from('waitlist_entries').insert({ email: waitlistEmail, source: 'catalogue_dossier' })
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user?.email) {
+        await supabase.from('waitlist_entries').insert({
+          email: user.email,
+          source: 'catalogue_dossier',
+          aid_id: d.id,
+        })
+      }
       setWaitlistSent(true)
     } catch {
       setWaitlistSent(true)
@@ -289,23 +293,13 @@ function TabDossier({ d }: { d: Dispositif }) {
         {waitlistSent ? (
           <div style={{ fontSize: 14, color: '#1F5A44', fontWeight: 600 }}>✓ Vous serez prévenu au lancement. Merci !</div>
         ) : (
-          <form onSubmit={handleWaitlist} style={{ display: 'flex', gap: 9, flexWrap: 'wrap' }}>
-            <input
-              type="email"
-              required
-              placeholder="votre@email.ma"
-              value={waitlistEmail}
-              onChange={(e) => setWaitlistEmail(e.target.value)}
-              style={{ flex: 1, minWidth: 200, fontFamily: "'Inter', sans-serif", fontSize: 13.5, border: '1px solid #C9BFAE', borderRadius: 9, padding: '10px 12px', outline: 'none' }}
-            />
-            <button
-              type="submit"
-              disabled={waitlistLoading}
-              style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 13.5, color: '#1F5A44', border: '1px solid #DCE9E2', background: '#F7FAF8', borderRadius: 10, padding: '11px 18px', cursor: 'pointer', whiteSpace: 'nowrap' }}
-            >
-              {waitlistLoading ? 'Envoi...' : 'Être prévenu au lancement'}
-            </button>
-          </form>
+          <button
+            onClick={handleWaitlist}
+            disabled={waitlistLoading}
+            style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 13.5, color: '#1F5A44', border: '1px solid #DCE9E2', background: '#F7FAF8', borderRadius: 10, padding: '11px 18px', cursor: 'pointer' }}
+          >
+            {waitlistLoading ? 'Envoi...' : 'Être prévenu au lancement'}
+          </button>
         )}
       </div>
     </div>

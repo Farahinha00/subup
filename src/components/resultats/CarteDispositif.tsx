@@ -58,10 +58,18 @@ export default function CarteDispositif({ resultat }: Props) {
         </div>
       </div>
 
-      {/* Ligne de chiffres */}
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 18 }}>
-        <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 18 }}>{montant}</span>
-        <span style={{ fontSize: 13.5, color: '#8A8378' }}>· {nature}{d.delai_indicatif ? ` · ${d.delai_indicatif}` : ''}</span>
+      {/* 3 tuiles Montant / Nature / Délai */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10, marginBottom: 18 }}>
+        {[
+          { label: 'Montant', value: montant },
+          { label: 'Nature', value: nature },
+          { label: 'Délai', value: d.delai_indicatif ?? 'Variable' },
+        ].map((t) => (
+          <div key={t.label} style={{ background: '#F1EEE9', borderRadius: 10, padding: '10px 14px' }}>
+            <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', color: '#8A8378', marginBottom: 4 }}>{t.label}</div>
+            <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 13.5, lineHeight: 1.3, color: '#221F1D' }}>{t.value}</div>
+          </div>
+        ))}
       </div>
 
       {/* Résumé d'éligibilité */}

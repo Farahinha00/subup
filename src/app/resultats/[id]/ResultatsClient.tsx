@@ -33,7 +33,6 @@ export default function ResultatsClient({
   pays = 'MA', nomEntreprise,
 }: Props) {
   const [filtreActif, setFiltreActif] = useState<'accessibles' | 'tous'>('accessibles')
-  const [waitlistEmail, setWaitlistEmail] = useState('')
   const [waitlistSent, setWaitlistSent] = useState(false)
   const [waitlistLoading, setWaitlistLoading] = useState(false)
 
@@ -71,13 +70,14 @@ export default function ResultatsClient({
     return `${v} ${devise}`
   }
 
-  async function handleWaitlist(e: React.FormEvent) {
-    e.preventDefault()
-    if (!waitlistEmail) return
+  async function handleWaitlist() {
     setWaitlistLoading(true)
     try {
       const supabase = createClient()
-      await supabase.from('waitlist_entries').insert({ email: waitlistEmail, source: 'resultats' })
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user?.email) {
+        await supabase.from('waitlist_entries').insert({ email: user.email, source: 'resultats' })
+      }
       setWaitlistSent(true)
     } catch {
       setWaitlistSent(true)
@@ -250,36 +250,21 @@ export default function ResultatsClient({
           </div>
 
           {waitlistSent ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: '#1F5A44', fontWeight: 600 }}>
-              <span>✓</span> Vous serez prévenu au lancement. Merci !
+            <div style={{ fontSize: 14, color: '#1F5A44', fontWeight: 600 }}>
+              ✓ Vous serez prévenu au lancement. Merci !
             </div>
           ) : (
-            <form onSubmit={handleWaitlist} style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-              <input
-                type="email"
-                required
-                placeholder="votre@email.ma"
-                value={waitlistEmail}
-                onChange={(e) => setWaitlistEmail(e.target.value)}
-                style={{
-                  flex: 1, minWidth: 240,
-                  fontSize: 14, padding: '11px 16px', borderRadius: 10,
-                  border: '1px solid #E7E1D9', background: '#fff', color: '#221F1D', outline: 'none',
-                }}
-              />
-              <button
-                type="submit"
-                disabled={waitlistLoading}
-                style={{
-                  fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 14,
-                  padding: '11px 20px', borderRadius: 10,
-                  border: '1.5px solid #1F5A44', background: 'transparent', color: '#1F5A44',
-                  cursor: 'pointer', whiteSpace: 'nowrap',
-                }}
-              >
-                {waitlistLoading ? 'Envoi...' : 'Être prévenu au lancement'}
-              </button>
-            </form>
+            <button
+              onClick={handleWaitlist}
+              disabled={waitlistLoading}
+              style={{
+                fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 13.5,
+                color: '#1F5A44', border: '1px solid #DCE9E2', background: '#F7FAF8',
+                borderRadius: 10, padding: '11px 18px', cursor: 'pointer',
+              }}
+            >
+              {waitlistLoading ? 'Envoi...' : 'Être prévenu au lancement'}
+            </button>
           )}
         </div>
 

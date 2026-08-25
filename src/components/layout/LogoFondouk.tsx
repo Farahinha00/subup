@@ -11,10 +11,10 @@ function LogoIcon({ size, dark }: { size: number; dark: boolean }) {
   return (
     <svg width={size} height={size} viewBox="0 0 56 56" fill="none" aria-hidden>
       <rect width="56" height="56" rx="16" fill={dark ? '#FAF8F5' : '#221F1D'} />
-      <rect x="12" y="12" width="18" height="18" rx="3" fill="#E2703A" />
-      <rect x="34" y="12" width="18" height="18" rx="3" fill={dark ? '#221F1D' : '#FAF8F5'} />
-      <rect x="12" y="34" width="18" height="18" rx="3" fill={dark ? '#221F1D' : '#FAF8F5'} />
-      <rect x="34" y="34" width="18" height="18" rx="3" fill="#1F5A44" />
+      <rect x="8"  y="8"  width="18" height="18" rx="3" fill="#E2703A" />
+      <rect x="30" y="8"  width="18" height="18" rx="3" fill={dark ? '#221F1D' : '#FAF8F5'} />
+      <rect x="8"  y="30" width="18" height="18" rx="3" fill={dark ? '#221F1D' : '#FAF8F5'} />
+      <rect x="30" y="30" width="18" height="18" rx="3" fill="#1F5A44" />
     </svg>
   )
 }
@@ -46,7 +46,7 @@ export function Logo({
         >
           Fondouk
         </span>
-        {variant === 'beta' && (
+        {(variant === 'beta' || variant === 'onDark') && (
           <span
             style={{
               fontFamily: "'Inter', sans-serif",

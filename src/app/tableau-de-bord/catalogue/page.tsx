@@ -12,6 +12,7 @@ export default async function CataloguePage() {
     .from('dispositifs')
     .select('*')
     .eq('actif', true)
+    .eq('pays', 'MA')
     .order('nom')
 
   return <CatalogueClient dispositifs={(dispositifs ?? []) as Dispositif[]} />
