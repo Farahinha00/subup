@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 
 const steps = [
   { n: '01', title: 'Décrivez votre projet', desc: 'Secteur, taille, région — décrivez en quelques mots ou répondez aux questions guidées.' },
-  { n: '02', title: 'Recevez vos matchs', desc: 'Sub\'up croise votre profil avec les dispositifs actifs et calcule votre éligibilité réelle.' },
+  { n: '02', title: 'Recevez vos matchs', desc: 'Fondouk croise votre profil avec les dispositifs actifs et calcule votre éligibilité réelle.' },
   { n: '03', title: 'Passez à l\'action', desc: 'Identifiez les dispositifs accessibles, les critères validés et les prochaines étapes.' },
 ]
 
@@ -47,8 +47,8 @@ export default async function LandingPage() {
 
           <p className="text-[17px] leading-relaxed text-ardoise-moyen max-w-lg mb-9">
             {multiPays
-              ? 'Sub\'up analyse le profil de votre entreprise et vous connecte aux aides publiques marocaines et françaises auxquelles vous êtes réellement éligible.'
-              : 'Sub\'up analyse le profil de votre entreprise et vous connecte aux aides publiques auxquelles vous êtes réellement éligible — sans jargon, sans consultant.'}
+              ? 'Fondouk analyse le profil de votre entreprise et vous connecte aux aides publiques marocaines et françaises auxquelles vous êtes réellement éligible.'
+              : 'Fondouk analyse le profil de votre entreprise et vous connecte aux aides publiques auxquelles vous êtes réellement éligible — sans jargon, sans consultant.'}
           </p>
 
           {multiPays ? (
