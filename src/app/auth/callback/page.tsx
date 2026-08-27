@@ -28,7 +28,11 @@ function CallbackHandler() {
         .single()
 
       if (!profile?.onboarding_completed_at) {
-        router.replace('/inscription?step=profile&from=google')
+        const isGoogle = session.user.app_metadata?.provider === 'google'
+        router.replace(isGoogle
+          ? '/inscription?step=profile&from=google'
+          : '/inscription?step=profile'
+        )
       } else {
         router.replace(next)
       }

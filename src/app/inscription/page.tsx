@@ -252,7 +252,7 @@ function InscriptionForm() {
             Un lien de confirmation a été envoyé à <strong style={{ color: '#221F1D' }}>{form.email}</strong>. Cliquez dessus pour activer votre compte.
           </p>
           <div style={{ background: '#FAF8F5', border: '1px solid #E7E1D9', borderRadius: 12, padding: '16px 20px', textAlign: 'left', marginBottom: 20 }}>
-            {['1. Ouvrez votre boîte mail', '2. Cherchez un email de "Fondouk"', '3. Cliquez sur "Confirmer mon email"', '4. Vous serez redirigé vers votre tableau de bord'].map((s) => (
+            {['1. Ouvrez votre boîte mail', '2. Cherchez un email de confirmation (expéditeur : noreply@supabase.io)', '3. Cliquez sur "Confirmer mon email"', '4. Vous serez redirigé vers votre tableau de bord'].map((s) => (
               <p key={s} style={{ fontSize: 13.5, color: '#4A453F', margin: '4px 0', lineHeight: 1.5 }}>{s}</p>
             ))}
           </div>
