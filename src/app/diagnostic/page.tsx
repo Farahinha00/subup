@@ -29,9 +29,11 @@ export default async function DiagnosticPage() {
   }
 
   return (
-    <DiagnosticPageClient
-      paysActifs={paysActifs}
-      profileReponses={profileReponses}
-    />
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: '#FAF8F5' }}>
+      <DiagnosticPageClient
+        paysActifs={paysActifs}
+        profileReponses={profileReponses}
+      />
+    </div>
   )
 }

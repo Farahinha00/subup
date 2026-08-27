@@ -23,6 +23,12 @@ export default function Sidebar() {
   const [ini, setIni] = useState('…')
   const [email, setEmail] = useState<string | null>(null)
 
+  async function handleSignOut() {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    window.location.href = '/'
+  }
+
   useEffect(() => {
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -95,6 +101,16 @@ export default function Sidebar() {
             {email && <div className="text-[10px] truncate" style={{ color: 'rgba(234,243,238,0.5)' }}>{email}</div>}
           </div>
         </Link>
+        <button
+          onClick={handleSignOut}
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-[10px] transition-colors mt-1"
+          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(234,243,238,0.5)', fontSize: 12 }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = 'rgba(234,243,238,0.85)')}
+          onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(234,243,238,0.5)')}
+        >
+          <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: 'rgba(234,243,238,0.2)' }} />
+          Déconnexion
+        </button>
       </div>
     </aside>
   )
