@@ -522,10 +522,7 @@ function CatalogueContent({ dispositifs }: { dispositifs: Dispositif[] }) {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 20, flexWrap: 'wrap', marginBottom: 14, flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
             <h1 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 25, letterSpacing: '-0.015em', margin: 0 }}>Catalogue des dispositifs</h1>
-            <span style={{ fontSize: 13.5, color: '#8A8378' }}>{liste.length} dispositifs · consultation libre</span>
-          </div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#EAF3EE', color: '#1F5A44', fontSize: 12.5, fontWeight: 700, padding: '6px 13px', borderRadius: 100 }}>
-            Accès gratuit
+            <span style={{ fontSize: 13.5, color: '#8A8378' }}>{liste.length} dispositifs</span>
           </div>
         </div>
 

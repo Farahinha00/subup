@@ -29,10 +29,22 @@ function CallbackHandler() {
 
       if (!profile?.onboarding_completed_at) {
         const isGoogle = session.user.app_metadata?.provider === 'google'
-        router.replace(isGoogle
-          ? '/inscription?step=profile&from=google'
-          : '/inscription?step=profile'
-        )
+        if (isGoogle) {
+          router.replace('/inscription?step=profile&from=google')
+        } else {
+          // Email signup — récupère role/goal depuis user_metadata et finalise le profil
+          const meta = session.user.user_metadata ?? {}
+          await supabase.from('profiles').upsert({
+            id: session.user.id,
+            prenom: meta.prenom ?? null,
+            nom: meta.nom ?? null,
+            role_type: meta.role_type ?? null,
+            role_other_label: meta.role_other_label ?? null,
+            primary_goal: meta.primary_goal ?? null,
+            onboarding_completed_at: new Date().toISOString(),
+          })
+          router.replace(next)
+        }
       } else {
         router.replace(next)
       }

@@ -231,7 +231,7 @@ function DiagnosticInner({ paysActifs, profileReponses }: {
 
   if (!pays) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-16">
+      <div className="max-w-4xl mx-auto px-4 py-16">
         <div className="text-center mb-10">
           <h1 className="font-grotesk font-bold text-[28px] text-ardoise mb-2">
             Diagnostic d&apos;éligibilité
@@ -255,7 +255,7 @@ function DiagnosticInner({ paysActifs, profileReponses }: {
   const totalEtapes = 3
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-12">
+    <div className="max-w-4xl mx-auto px-4 py-12">
       {/* En-tête */}
       <div className="text-center mb-8">
         <h1 className="font-grotesk font-bold text-[24px] text-ardoise">

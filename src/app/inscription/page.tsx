@@ -171,6 +171,8 @@ function InscriptionForm() {
     e.preventDefault()
     if (form.password !== form.passwordConfirm) { setError('Les mots de passe ne correspondent pas.'); return }
     if (score < 2) { setError('Mot de passe trop faible. Ajoutez des majuscules, chiffres ou symboles.'); return }
+    if (!roleType) { setError('Veuillez indiquer votre rôle.'); return }
+    if (!goal) { setError('Veuillez sélectionner votre objectif principal.'); return }
     setLoading(true)
     setError('')
 
@@ -180,7 +182,13 @@ function InscriptionForm() {
       password: form.password,
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
-        data: { prenom: form.prenom, nom: form.nom },
+        // stocke role/goal dans user_metadata pour les récupérer après confirmation email
+        data: {
+          prenom: form.prenom, nom: form.nom,
+          role_type: roleType,
+          role_other_label: roleType === 'autre' ? roleOther.trim() : null,
+          primary_goal: goal,
+        },
       },
     })
 
@@ -192,12 +200,34 @@ function InscriptionForm() {
     if (!data.user) { setError('Erreur inattendue. Réessayez.'); setLoading(false); return }
 
     if (data.session) {
-      // Immediately logged in — go to profile step
-      await supabase.from('profiles').upsert({ id: data.user.id, prenom: form.prenom, nom: form.nom })
+      // Session immédiate — upsert profil complet et redirection
+      await supabase.from('profiles').upsert({
+        id: data.user.id, prenom: form.prenom, nom: form.nom,
+        role_type: roleType,
+        role_other_label: roleType === 'autre' ? roleOther.trim() : null,
+        primary_goal: goal,
+        onboarding_completed_at: new Date().toISOString(),
+      })
       setLoading(false)
-      setStep('profile')
+
+      if (fromDiagnostic) {
+        const draft = localStorage.getItem(STORAGE_KEY)
+        if (draft) {
+          try {
+            const reponses = JSON.parse(draft) as Reponses
+            const { data: diagnostic } = await supabase.from('diagnostics').insert({ user_id: data.user.id, pays: reponses.pays ?? 'MA', reponses }).select().single()
+            if (diagnostic) {
+              await fetch('/api/matching', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ diagnosticId: diagnostic.id }) })
+              localStorage.removeItem(STORAGE_KEY)
+              router.push(`/resultats/${diagnostic.id}`)
+              return
+            }
+          } catch {}
+        }
+      }
+      router.push('/tableau-de-bord')
     } else {
-      // Email confirmation required
+      // Confirmation email requise
       setLoading(false)
       setStep('email_sent')
     }
@@ -441,6 +471,51 @@ function InscriptionForm() {
             />
             {passwordMismatch && <p style={{ fontSize: 11.5, color: '#E85D3B', marginTop: 4 }}>Ne correspond pas</p>}
             {!passwordMismatch && form.passwordConfirm.length > 0 && <p style={{ fontSize: 11.5, color: '#1F5A44', marginTop: 4 }}>✓ Identiques</p>}
+          </div>
+        </div>
+
+        {/* Séparateur */}
+        <div style={{ height: 1, background: '#E7E1D9', margin: '4px 0' }} />
+
+        {/* Rôle */}
+        <div>
+          <label style={{ ...LABEL, fontSize: 13.5, marginBottom: 10 }}>Vous êtes… <span style={{ color: '#E2703A' }}>*</span></label>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {ROLE_OPTIONS.map((r) => (
+              <button
+                key={r.id} type="button" onClick={() => setRoleType(r.id)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 10, padding: '11px 14px', borderRadius: 10,
+                  background: roleType === r.id ? '#F7FAF8' : '#fff',
+                  border: `1.5px solid ${roleType === r.id ? '#1F5A44' : '#E7E1D9'}`,
+                  cursor: 'pointer', textAlign: 'left', width: '100%',
+                }}
+              >
+                <div style={{ width: 16, height: 16, borderRadius: '50%', border: `2px solid ${roleType === r.id ? '#1F5A44' : '#C9BFAE'}`, background: roleType === r.id ? '#1F5A44' : 'transparent', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {roleType === r.id && <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#fff' }} />}
+                </div>
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: 13, color: roleType === r.id ? '#1F5A44' : '#221F1D' }}>{r.label}</div>
+                  <div style={{ fontSize: 12, color: '#6B6560' }}>{r.desc}</div>
+                </div>
+              </button>
+            ))}
+          </div>
+          {roleType === 'autre' && (
+            <input type="text" placeholder="Précisez votre rôle…" value={roleOther} onChange={(e) => setRoleOther(e.target.value)} style={{ ...INPUT, marginTop: 8 }} />
+          )}
+        </div>
+
+        {/* Objectif */}
+        <div>
+          <label style={{ ...LABEL, fontSize: 13.5 }}>Objectif principal <span style={{ color: '#E2703A' }}>*</span></label>
+          <div style={{ position: 'relative' }}>
+            <select value={goal} onChange={(e) => setGoal(e.target.value)}
+              style={{ ...INPUT, appearance: 'none', paddingRight: 36, cursor: 'pointer', border: `1.5px solid ${goal ? '#1F5A44' : '#E7E1D9'}` }}>
+              <option value="">Sélectionner…</option>
+              {GOAL_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+            <div style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#8A8378', fontSize: 12 }}>▾</div>
           </div>
         </div>
 
