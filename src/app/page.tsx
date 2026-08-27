@@ -25,6 +25,7 @@ export default async function LandingPage() {
     .from('dispositifs')
     .select('*', { count: 'exact', head: true })
     .eq('actif', true)
+    .eq('pays', 'MA')
   const nbLabel = nbDispositifs ? `${nbDispositifs}+` : '…'
 
   return (
