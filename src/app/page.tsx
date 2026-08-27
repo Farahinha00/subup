@@ -66,7 +66,10 @@ export default async function LandingPage() {
                 className="btn-primary py-4 px-7 text-base rounded-[10px] inline-block">
                 Vérifier mon éligibilité →
               </Link>
-              <Link href="/diagnostic" className="text-[15px] font-semibold text-ardoise hover:text-vert transition flex items-center gap-1.5">
+              <Link
+                href={isLoggedIn ? '/tableau-de-bord/catalogue' : '/connexion?redirect=%2Ftableau-de-bord%2Fcatalogue'}
+                className="text-[15px] font-semibold text-ardoise hover:text-vert transition flex items-center gap-1.5"
+              >
                 Voir les dispositifs →
               </Link>
             </div>
