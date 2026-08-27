@@ -160,12 +160,12 @@ export default async function LandingPage() {
               Prêt à financer votre prochaine étape ?
             </h2>
             <p className="text-vert-pale text-[15px] mb-8">
-              Gratuit pour vérifier votre éligibilité. Aucune carte bancaire requise.
+              Aucune carte bancaire requise.
             </p>
             <div className="flex items-center justify-center gap-4 flex-wrap">
               <Link href="/diagnostic"
                 className="font-grotesk font-semibold text-[15px] bg-fond text-vert hover:bg-pierre transition px-7 py-3.5 rounded-[10px] inline-block">
-                Commencer gratuitement
+                Commencer
               </Link>
               {!isLoggedIn && (
                 <Link href="/connexion" className="text-[14px] font-medium text-vert-pale hover:text-fond transition">

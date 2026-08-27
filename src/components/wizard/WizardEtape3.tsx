@@ -90,7 +90,7 @@ export default function WizardEtape3({ reponses, onChange, onSubmit, onBack, loa
       </div>
 
       <div className="bg-corail-pale rounded-xl p-4 text-sm text-corail-fonce" style={{ border: '1px solid rgba(226,112,58,0.2)' }}>
-        Presque terminé — vos résultats personnalisés s'affichent après création de votre compte gratuit.
+        Presque terminé — vos résultats personnalisés s'affichent après création de votre compte.
       </div>
 
       <div className="flex gap-3">

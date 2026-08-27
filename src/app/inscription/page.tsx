@@ -414,7 +414,7 @@ function InscriptionForm() {
             Encore une étape pour voir vos résultats
           </div>
         )}
-        <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 22, marginBottom: 6 }}>Créer mon compte gratuit</div>
+        <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 22, marginBottom: 6 }}>Créer mon compte</div>
         <p style={{ fontSize: 13.5, color: '#6B6560', margin: 0 }}>Aucune carte bancaire. Résultats immédiats.</p>
       </div>
 

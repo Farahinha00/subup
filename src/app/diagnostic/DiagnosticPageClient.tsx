@@ -376,7 +376,7 @@ function MurCapture() {
       <div className="text-center mb-7">
         <h2 className="font-grotesk font-bold text-[24px] text-ardoise mb-2">Vos résultats sont prêts !</h2>
         <p className="text-ardoise-clair text-[14px] leading-relaxed">
-          Créez votre compte gratuit pour voir votre score d&apos;éligibilité, les critères validés et les documents à préparer.
+          Créez votre compte pour voir votre score d&apos;éligibilité, les critères validés et les documents à préparer.
         </p>
       </div>
       <div className="card rounded-[16px] mb-6">
@@ -396,7 +396,7 @@ function MurCapture() {
         </ul>
       </div>
       <button onClick={() => router.push('/inscription?from=diagnostic')} className="btn-primary w-full py-3.5 text-[15px] mb-3">
-        Créer mon compte gratuit →
+        Créer mon compte →
       </button>
       <button onClick={() => router.push('/connexion?from=diagnostic')} className="w-full text-[13px] text-ardoise-clair hover:text-ardoise transition text-center">
         J&apos;ai déjà un compte — me connecter

@@ -106,11 +106,6 @@ export default function ResultatsClient({
             </Link>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            {/* Crédits dossier — Prochainement */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', border: '1px dashed #C9BFAE', borderRadius: 100 }}>
-              <span style={{ fontSize: 13, color: '#8A8378', fontWeight: 500 }}>Crédits dossier</span>
-              <span style={BADGE_PROCHAINEMENT}>PROCHAINEMENT</span>
-            </div>
             <Link href="/tableau-de-bord/catalogue"
               style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 13.5, background: '#F1EEE9', color: '#4A453F', borderRadius: 9, padding: '9px 18px', textDecoration: 'none' }}>
               Catalogue
@@ -123,14 +118,11 @@ export default function ResultatsClient({
 
         {/* ── En-tête ── */}
         <div style={{ marginBottom: 36 }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#F1EEE9', border: '1px solid #E7E1D9', borderRadius: 100, padding: '4px 12px', fontSize: 12, fontWeight: 700, color: '#6B6560', marginBottom: 12, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-            Version gratuite
-          </div>
           <h1 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 30, letterSpacing: '-0.01em', margin: '0 0 8px' }}>
             {eligibles.length} dispositif{eligibles.length > 1 ? 's' : ''} pour {nomEntreprise}
           </h1>
           <p style={{ fontSize: 14, color: '#6B6560', margin: 0, lineHeight: 1.6 }}>
-            Voici les aides auxquelles vous êtes éligible, avec l&apos;essentiel à savoir. Le montage de dossier arrive prochainement.
+            Voici les aides auxquelles vous êtes éligible, avec l&apos;essentiel à savoir.
           </p>
         </div>
 
@@ -232,41 +224,6 @@ export default function ResultatsClient({
             <p style={{ fontSize: 15, color: '#8A8378' }}>Aucun résultat disponible pour ce diagnostic.</p>
           </div>
         )}
-
-        {/* ── Encart waitlist ── */}
-        <div style={{ marginTop: 56, border: '2px dashed #C9BFAE', borderRadius: 18, padding: '32px 36px' }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 24, flexWrap: 'wrap', marginBottom: 20 }}>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 17 }}>
-                  Le montage de dossier
-                </span>
-                <span style={BADGE_PROCHAINEMENT}>PROCHAINEMENT</span>
-              </div>
-              <p style={{ fontSize: 14, color: '#6B6560', lineHeight: 1.7, margin: 0, maxWidth: 520 }}>
-                Vérification des critères bloquants, liste nominative des pièces, modèles pré-remplis à télécharger et étapes de dépôt commentées jusqu&apos;au décaissement — pour chacun de vos dispositifs.
-              </p>
-            </div>
-          </div>
-
-          {waitlistSent ? (
-            <div style={{ fontSize: 14, color: '#1F5A44', fontWeight: 600 }}>
-              ✓ Vous serez prévenu au lancement. Merci !
-            </div>
-          ) : (
-            <button
-              onClick={handleWaitlist}
-              disabled={waitlistLoading}
-              style={{
-                fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 13.5,
-                color: '#1F5A44', border: '1px solid #DCE9E2', background: '#F7FAF8',
-                borderRadius: 10, padding: '11px 18px', cursor: 'pointer',
-              }}
-            >
-              {waitlistLoading ? 'Envoi...' : 'Être prévenu au lancement'}
-            </button>
-          )}
-        </div>
 
         <p style={{ fontSize: 12, color: '#8A8378', textAlign: 'center', marginTop: 40 }}>
           Ces résultats sont indicatifs. Vérifiez votre éligibilité définitive auprès des organismes concernés. Dernière vérification : août 2026.

@@ -73,18 +73,20 @@ function ConnexionForm() {
       return
     }
 
-    const draft = localStorage.getItem(STORAGE_KEY)
-    if (draft && data.user) {
-      try {
-        const reponses = JSON.parse(draft) as Reponses
-        const { data: diagnostic } = await supabase.from('diagnostics').insert({ user_id: data.user.id, pays: reponses.pays ?? 'MA', reponses }).select().single()
-        if (diagnostic) {
-          await fetch('/api/matching', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ diagnosticId: diagnostic.id }) })
-          localStorage.removeItem(STORAGE_KEY)
-          router.push(`/resultats/${diagnostic.id}`)
-          return
-        }
-      } catch {}
+    if (fromDiagnostic) {
+      const draft = localStorage.getItem(STORAGE_KEY)
+      if (draft && data.user) {
+        try {
+          const reponses = JSON.parse(draft) as Reponses
+          const { data: diagnostic } = await supabase.from('diagnostics').insert({ user_id: data.user.id, pays: reponses.pays ?? 'MA', reponses }).select().single()
+          if (diagnostic) {
+            await fetch('/api/matching', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ diagnosticId: diagnostic.id }) })
+            localStorage.removeItem(STORAGE_KEY)
+            router.push(`/resultats/${diagnostic.id}`)
+            return
+          }
+        } catch {}
+      }
     }
 
     router.push(redirect ?? '/tableau-de-bord')
@@ -123,7 +125,7 @@ function ConnexionForm() {
           </button>
         </form>
         <p className="text-center text-xs text-gray-400 mt-5">
-          Pas encore de compte ? <Link href="/inscription" className="text-corail font-medium hover:underline">Créer un compte gratuit</Link>
+          Pas encore de compte ? <Link href="/inscription" className="text-corail font-medium hover:underline">Créer un compte</Link>
         </p>
       </div>
     </div>

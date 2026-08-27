@@ -67,7 +67,7 @@ export default function WizardQuestionsManquantes({
       )}
 
       <div className="bg-vert-pale rounded-[10px] px-4 py-3.5 text-sm text-vert" style={{ border: '1px solid var(--vert-pale)' }}>
-        Presque terminé — vos résultats personnalisés s&apos;affichent après création de votre compte gratuit.
+        Presque terminé — vos résultats personnalisés s&apos;affichent après création de votre compte.
       </div>
 
       <div className="flex gap-3">

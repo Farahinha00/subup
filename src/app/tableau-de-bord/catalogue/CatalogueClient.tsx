@@ -346,7 +346,6 @@ function DetailPanel({ d }: { d: Dispositif }) {
   const tabs: { label: React.ReactNode; badge?: number }[] = [
     { label: 'À quoi ça consiste' },
     { label: 'Critères d\'éligibilité', badge: criteres.length },
-    { label: '🔒 Dossier' },
   ]
 
   return (
@@ -401,7 +400,6 @@ function DetailPanel({ d }: { d: Dispositif }) {
       <div style={{ overflowY: 'auto', flex: 1, minHeight: 240, padding: '20px 28px 24px' }}>
         {activeTab === 0 && <TabDesc d={d} />}
         {activeTab === 1 && <TabCriteria d={d} />}
-        {activeTab === 2 && <TabDossier d={d} />}
       </div>
 
       {/* Bandeau signalement (au-dessus du pied) */}
