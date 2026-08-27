@@ -560,13 +560,6 @@ function PageShell({ children }: { children: React.ReactNode }) {
           <Link href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
             <Logo size="nav" variant="beta" />
           </Link>
-          <Link href="/tableau-de-bord/catalogue"
-            style={{ fontSize: 13.5, fontWeight: 600, color: '#4A453F', textDecoration: 'none' }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = '#1F5A44')}
-            onMouseLeave={(e) => (e.currentTarget.style.color = '#4A453F')}
-          >
-            Explorer le catalogue d&apos;abord →
-          </Link>
         </div>
       </div>
 
