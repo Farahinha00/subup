@@ -49,7 +49,7 @@ export default async function LandingPage() {
           <p className="text-[17px] leading-relaxed text-ardoise-moyen max-w-lg mb-9">
             {multiPays
               ? 'Fondouk analyse le profil de votre entreprise et vous connecte aux aides publiques marocaines et françaises auxquelles vous êtes réellement éligible.'
-              : 'Fondouk analyse le profil de votre entreprise et vous connecte aux aides publiques auxquelles vous êtes réellement éligible — sans jargon, sans consultant.'}
+              : 'Fondouk analyse le profil de votre entreprise et vous connecte aux aides publiques auxquelles vous êtes réellement éligible.'}
           </p>
 
           {multiPays ? (
