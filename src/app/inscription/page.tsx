@@ -120,6 +120,7 @@ function InscriptionForm() {
   const [roleType, setRoleType] = useState<RoleType | null>(null)
   const [roleOther, setRoleOther] = useState('')
   const [goal, setGoal] = useState('')
+  const [goalOther, setGoalOther] = useState('')
   const [loading, setLoading] = useState(false)
   const [loadingGoogle, setLoadingGoogle] = useState(false)
   const [error, setError] = useState('')
@@ -186,7 +187,7 @@ function InscriptionForm() {
           prenom: form.prenom, nom: form.nom,
           role_type: roleType,
           role_other_label: roleType === 'autre' ? roleOther.trim() : null,
-          primary_goal: goal,
+          primary_goal: goal === 'autre' ? `autre: ${goalOther.trim()}` : goal,
         },
       },
     })
@@ -204,7 +205,7 @@ function InscriptionForm() {
         id: data.user.id, prenom: form.prenom, nom: form.nom,
         role_type: roleType,
         role_other_label: roleType === 'autre' ? roleOther.trim() : null,
-        primary_goal: goal,
+        primary_goal: goal === 'autre' ? `autre: ${goalOther.trim()}` : goal,
         onboarding_completed_at: new Date().toISOString(),
       })
       setLoading(false)
@@ -516,6 +517,13 @@ function InscriptionForm() {
             </select>
             <div style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#8A8378', fontSize: 12 }}>▾</div>
           </div>
+          {goal === 'autre' && (
+            <input
+              type="text" placeholder="Précisez votre objectif…"
+              value={goalOther} onChange={(e) => setGoalOther(e.target.value)}
+              style={{ ...INPUT, marginTop: 8 }}
+            />
+          )}
         </div>
 
         {error && <div style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', color: '#B91C1C', fontSize: 13, borderRadius: 10, padding: '10px 14px' }}>{error}</div>}

@@ -28,7 +28,7 @@ export default function WizardTextLibre({ onAnalyser, onWizardClassique, loading
         <textarea
           value={texte}
           onChange={(e) => setTexte(e.target.value.slice(0, MAX_CHARS))}
-          placeholder="Ex : Je suis en train de créer une salle de sport à Rabat, investissement d'environ 2 M de dirhams, je compte embaucher 5 personnes en CDI, j'ai 20% d'apport, je suis Marocain résidant en France depuis 10 ans…"
+          placeholder="Ex : Je développe une chaîne de boulangeries à Tanger, 3 points de vente prévus, investissement d'environ 1,5 M de dirhams, je veux digitaliser la gestion des caisses et lancer la vente en ligne, et j'embauche 8 personnes."
           rows={6}
           className="input w-full resize-none leading-relaxed text-sm"
           disabled={loading}
@@ -68,9 +68,12 @@ export default function WizardTextLibre({ onAnalyser, onWizardClassique, loading
       <div className="pt-4 border-t border-pierre text-center">
         <button
           onClick={onWizardClassique}
-          className="text-[13px] text-ardoise-clair hover:text-ardoise transition"
+          className="text-[13px] font-medium transition"
+          style={{ border: '1px solid #E7E1D9', borderRadius: 9, padding: '9px 18px', background: '#fff', color: '#4A453F', cursor: 'pointer' }}
+          onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#C9BFAE'; e.currentTarget.style.background = '#FAF8F5' }}
+          onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E7E1D9'; e.currentTarget.style.background = '#fff' }}
         >
-          Préférez-vous répondre aux questions une par une ?
+          Répondre aux questions une par une
         </button>
       </div>
 
