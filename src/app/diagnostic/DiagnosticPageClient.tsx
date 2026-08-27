@@ -229,6 +229,19 @@ function DiagnosticInner({ paysActifs, profileReponses }: {
 
   if (mode === 'mur') return <MurCapture />
 
+  if (mode === 'texte' && pays) {
+    return (
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+        <WizardTextLibre
+          onAnalyser={handleAnalyser}
+          onWizardClassique={handleWizardClassique}
+          loading={loading}
+          erreur={extractionErreur}
+        />
+      </div>
+    )
+  }
+
   if (!pays) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-16">
@@ -270,15 +283,6 @@ function DiagnosticInner({ paysActifs, profileReponses }: {
 
       {/* Card principale */}
       <div className="card rounded-[20px] p-6">
-        {mode === 'texte' && (
-          <WizardTextLibre
-            onAnalyser={handleAnalyser}
-            onWizardClassique={handleWizardClassique}
-            loading={loading}
-            erreur={extractionErreur}
-          />
-        )}
-
         {mode === 'recap' && extraction && (
           <WizardRecapitulatif
             extraction={extraction} reponses={reponses}
