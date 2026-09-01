@@ -252,8 +252,9 @@ function InscriptionForm() {
 
     if (profileError) { setError('Erreur lors de l\'enregistrement. Réessayez.'); setLoading(false); return }
 
-    // Handle diagnostic flow
-    if (fromDiagnostic) {
+    // Handle diagnostic flow — fromDiagnostic OU diagnostic_recovery_pending (Google OAuth depuis le mur)
+    const recoveryPending = !!localStorage.getItem('diagnostic_recovery_pending')
+    if (fromDiagnostic || recoveryPending) {
       const draft = localStorage.getItem(STORAGE_KEY)
       if (draft) {
         try {
@@ -262,11 +263,13 @@ function InscriptionForm() {
           if (diagnostic) {
             await fetch('/api/matching', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ diagnosticId: diagnostic.id }) })
             localStorage.removeItem(STORAGE_KEY)
+            localStorage.removeItem('diagnostic_recovery_pending')
             router.push(`/resultats/${diagnostic.id}`)
             return
           }
         } catch {}
       }
+      localStorage.removeItem('diagnostic_recovery_pending')
     }
     router.push('/tableau-de-bord')
   }

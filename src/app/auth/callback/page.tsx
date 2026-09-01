@@ -5,6 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Suspense } from 'react'
 import type { Session } from '@supabase/supabase-js'
+import type { Reponses } from '@/types'
+
+const STORAGE_KEY = 'subventions_diagnostic_draft'
 
 function CallbackHandler() {
   const router = useRouter()
@@ -46,6 +49,26 @@ function CallbackHandler() {
           router.replace(next)
         }
       } else {
+        // Utilisateur déjà inscrit — vérifier si un diagnostic est en attente de récupération
+        const recoveryPending = localStorage.getItem('diagnostic_recovery_pending')
+        const draftStr = localStorage.getItem(STORAGE_KEY)
+        if (recoveryPending && draftStr) {
+          try {
+            const reponses = JSON.parse(draftStr) as Reponses
+            const { data: diagnostic } = await supabase
+              .from('diagnostics')
+              .insert({ user_id: session.user.id, pays: reponses.pays ?? 'MA', reponses })
+              .select().single()
+            if (diagnostic) {
+              await fetch('/api/matching', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ diagnosticId: diagnostic.id }) })
+              localStorage.removeItem(STORAGE_KEY)
+              localStorage.removeItem('diagnostic_recovery_pending')
+              router.replace(`/resultats/${diagnostic.id}`)
+              return
+            }
+          } catch {}
+          localStorage.removeItem('diagnostic_recovery_pending')
+        }
         router.replace(next)
       }
     }
