@@ -97,7 +97,7 @@ export default function WizardRecapitulatif({ extraction, reponses, onChange, on
                 </div>
                 <button
                   onClick={() => handleModifier(q.champ)}
-                  className="flex-shrink-0 text-xs font-medium text-ardoise-clair hover:text-corail transition mt-1"
+                  className="flex-shrink-0 text-xs font-medium text-ardoise-clair hover:text-vert transition mt-1"
                 >
                   {isEditing ? 'Annuler' : 'Modifier'}
                 </button>
@@ -147,7 +147,7 @@ function RadioCards({ name, options, value, onChange, cols = 1 }: {
       {options.map((opt) => (
         <label key={opt.value} className={`radio-card ${value === opt.value ? 'radio-card-active' : ''}`}>
           <input type="radio" name={name} value={opt.value} checked={value === opt.value}
-            onChange={() => onChange(opt.value)} className="accent-corail flex-shrink-0" />
+            onChange={() => onChange(opt.value)} className="accent-vert flex-shrink-0" />
           {opt.label}
         </label>
       ))}
@@ -166,9 +166,9 @@ function BooleanToggle({ champ, value, onChange, labelOui, labelNon }: {
         <label
           key={String(v)}
           className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-xl border cursor-pointer transition-all text-sm font-medium
-            ${value === v ? 'border-corail bg-corail-pale text-corail-fonce' : 'border-pierre bg-white text-ardoise hover:border-ardoise-clair'}`}
+            ${value === v ? 'border-vert bg-vert-pale text-vert' : 'border-pierre bg-white text-ardoise hover:border-ardoise-clair'}`}
         >
-          <input type="radio" name={champ} checked={value === v} onChange={() => onChange(v)} className="accent-corail" />
+          <input type="radio" name={champ} checked={value === v} onChange={() => onChange(v)} className="accent-vert" />
           {l}
         </label>
       ))}

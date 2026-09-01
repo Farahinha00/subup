@@ -84,10 +84,10 @@
     @apply font-semibold px-5 py-2.5 rounded-[9px] active:scale-95 transition-all duration-150
            disabled:opacity-40 disabled:cursor-not-allowed text-sm;
     font-family: 'Space Grotesk', system-ui, sans-serif;
-    background-color: var(--corail);
-    color: #fff;
+    background-color: var(--vert);
+    color: var(--fond);
   }
-  .btn-primary:hover { background-color: var(--corail-fonce); }
+  .btn-primary:hover { background-color: var(--vert-clair); }
 
   .btn-secondary {
     @apply font-medium px-5 py-2.5 rounded-[9px] active:scale-95 transition-all duration-150 text-sm;
@@ -155,13 +155,13 @@
     color: var(--ardoise);
   }
   .radio-card:hover {
-    border-color: color-mix(in srgb, var(--corail) 40%, transparent);
-    background-color: color-mix(in srgb, var(--corail-pale) 30%, transparent);
+    border-color: color-mix(in srgb, var(--vert) 40%, transparent);
+    background-color: color-mix(in srgb, var(--vert-pale) 50%, transparent);
   }
   .radio-card-active {
-    border-color: var(--corail);
-    background-color: var(--corail-pale);
-    color: var(--corail-fonce);
+    border-color: var(--vert);
+    background-color: var(--vert-pale);
+    color: var(--vert);
     font-weight: 500;
   }
 }

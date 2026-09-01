@@ -26,11 +26,11 @@ function BooleanToggle({ value, onChange, labelOui, labelNon }: {
   return (
     <div className="flex gap-2">
       <button type="button" onClick={() => onChange(true)}
-        className={`flex-1 py-2.5 rounded-xl text-sm font-medium border transition ${value === true ? 'bg-corail text-white border-corail' : 'bg-white text-ardoise border-gray-200 hover:border-corail-clair'}`}>
+        className={`flex-1 py-2.5 rounded-xl text-sm font-medium border transition ${value === true ? 'bg-vert text-fond border-vert' : 'bg-white text-ardoise border-gray-200 hover:border-vert-clair'}`}>
         {labelOui}
       </button>
       <button type="button" onClick={() => onChange(false)}
-        className={`flex-1 py-2.5 rounded-xl text-sm font-medium border transition ${value === false ? 'bg-corail text-white border-corail' : 'bg-white text-ardoise border-gray-200 hover:border-corail-clair'}`}>
+        className={`flex-1 py-2.5 rounded-xl text-sm font-medium border transition ${value === false ? 'bg-vert text-fond border-vert' : 'bg-white text-ardoise border-gray-200 hover:border-vert-clair'}`}>
         {labelNon}
       </button>
     </div>

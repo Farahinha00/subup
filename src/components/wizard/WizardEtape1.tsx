@@ -21,7 +21,7 @@ function RadioCards({ name, options, value, onChange, cols = 1 }: {
       {options.map((opt) => (
         <label key={opt.value} className={`radio-card ${value === opt.value ? 'radio-card-active' : ''}`}>
           <input type="radio" name={name} value={opt.value} checked={value === opt.value}
-            onChange={() => onChange(opt.value)} className="accent-corail flex-shrink-0" />
+            onChange={() => onChange(opt.value)} className="accent-vert flex-shrink-0" />
           {opt.label}
         </label>
       ))}
@@ -37,8 +37,8 @@ function BooleanToggle({ champ, value, onChange, labelOui, labelNon }: {
     <div className="flex gap-2">
       {[{ v: true, l: labelOui }, { v: false, l: labelNon }].map(({ v, l }) => (
         <label key={String(v)} className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-xl border cursor-pointer transition-all text-sm font-medium
-          ${value === v ? 'border-corail bg-corail-pale text-corail-fonce' : 'border-gray-200 bg-white text-ardoise hover:border-gray-300'}`}>
-          <input type="radio" name={champ} checked={value === v} onChange={() => onChange(v)} className="accent-corail" />
+          ${value === v ? 'border-vert bg-vert-pale text-vert' : 'border-gray-200 bg-white text-ardoise hover:border-gray-300'}`}>
+          <input type="radio" name={champ} checked={value === v} onChange={() => onChange(v)} className="accent-vert" />
           {l}
         </label>
       ))}
@@ -102,7 +102,7 @@ export default function WizardEtape1({ reponses, onChange, onNext }: Props) {
         <p className="text-xs text-gray-400 mt-2">Détermine l'accès aux programmes MRE (MDM Invest…).</p>
       </div>
 
-      <button onClick={onNext} disabled={!ok} className="btn-primary w-full py-3 rounded-xl bg-corail hover:bg-corail-fonce text-white disabled:opacity-40 transition">
+      <button onClick={onNext} disabled={!ok} className="btn-primary w-full py-3 rounded-xl disabled:opacity-40 transition">
         Continuer — Étape 2 →
       </button>
     </div>

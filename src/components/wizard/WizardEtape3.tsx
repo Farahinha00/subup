@@ -20,7 +20,7 @@ function RadioCards({ name, options, value, onChange }: {
       {options.map((opt) => (
         <label key={opt.value} className={`radio-card ${value === opt.value ? 'radio-card-active' : ''}`}>
           <input type="radio" name={name} value={opt.value} checked={value === opt.value}
-            onChange={() => onChange(opt.value)} className="accent-corail flex-shrink-0" />
+            onChange={() => onChange(opt.value)} className="accent-vert flex-shrink-0" />
           {opt.label}
         </label>
       ))}
@@ -36,8 +36,8 @@ function BooleanToggle({ champ, value, onChange, labelOui, labelNon }: {
     <div className="flex gap-2">
       {[{ v: true, l: labelOui }, { v: false, l: labelNon }].map(({ v, l }) => (
         <label key={String(v)} className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-xl border cursor-pointer transition-all text-sm font-medium
-          ${value === v ? 'border-corail bg-corail-pale text-corail-fonce' : 'border-gray-200 bg-white text-ardoise hover:border-gray-300'}`}>
-          <input type="radio" name={champ} checked={value === v} onChange={() => onChange(v)} className="accent-corail" />
+          ${value === v ? 'border-vert bg-vert-pale text-vert' : 'border-gray-200 bg-white text-ardoise hover:border-gray-300'}`}>
+          <input type="radio" name={champ} checked={value === v} onChange={() => onChange(v)} className="accent-vert" />
           {l}
         </label>
       ))}
@@ -89,14 +89,14 @@ export default function WizardEtape3({ reponses, onChange, onSubmit, onBack, loa
         <p className="text-xs text-gray-400 mt-2">Détermine l'accès à MOUSSANADA (prise en charge d'expertises jusqu'à 1 M MAD).</p>
       </div>
 
-      <div className="bg-corail-pale rounded-xl p-4 text-sm text-corail-fonce" style={{ border: '1px solid rgba(226,112,58,0.2)' }}>
-        Presque terminé — vos résultats personnalisés s'affichent après création de votre compte.
+      <div className="bg-vert-pale rounded-[10px] px-4 py-3.5 text-sm text-vert" style={{ border: '1px solid rgba(31,90,68,0.2)' }}>
+        Presque terminé — vos résultats personnalisés s&apos;affichent après création de votre compte.
       </div>
 
       <div className="flex gap-3">
         <button onClick={onBack} className="btn-secondary flex-1 py-3">← Retour</button>
         <button onClick={onSubmit} disabled={!ok || loading}
-          className="btn-primary flex-1 py-3 rounded-xl bg-corail hover:bg-corail-fonce text-white disabled:opacity-40 transition">
+          className="btn-primary flex-1 py-3 rounded-xl disabled:opacity-40 transition">
           {loading ? 'Calcul...' : 'Voir mes résultats →'}
         </button>
       </div>
