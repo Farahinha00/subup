@@ -523,16 +523,23 @@ function CatalogueContent({ dispositifs }: { dispositifs: Dispositif[] }) {
     <>
       <style>{`
         @media (max-width: 999px) {
-          .catalogue-grid { grid-template-columns: 1fr !important; }
-          .catalogue-list-col { height: auto !important; max-height: 320px; }
-          .catalogue-detail-col { height: auto !important; min-height: 600px; }
-          .catalogue-shell { height: auto !important; min-height: unset !important; }
+          .catalogue-grid { grid-template-columns: 1fr !important; overflow: visible !important; }
+          .catalogue-list-col { max-height: 320px !important; }
+          .catalogue-detail-col { min-height: 500px !important; }
+          .catalogue-shell { height: auto !important; overflow: visible !important; }
         }
       `}</style>
 
       <div
         className="catalogue-shell"
-        style={{ padding: '20px 24px', flex: 1, minHeight: 620, display: 'flex', flexDirection: 'column' }}
+        style={{
+          padding: '20px 24px',
+          height: 'calc(100vh - var(--banner-h, 0px))',
+          boxSizing: 'border-box',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+        }}
       >
         {/* En-tête compact */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 20, flexWrap: 'wrap', marginBottom: 14, flexShrink: 0 }}>
@@ -563,7 +570,7 @@ function CatalogueContent({ dispositifs }: { dispositifs: Dispositif[] }) {
         {/* Grille maître-détail */}
         <div
           className="catalogue-grid"
-          style={{ display: 'grid', gridTemplateColumns: '344px minmax(0,1fr)', gap: 18, flex: 1, minHeight: 0 }}
+          style={{ display: 'grid', gridTemplateColumns: '344px minmax(0,1fr)', gap: 18, flex: 1, minHeight: 0, overflow: 'hidden' }}
         >
           {/* Colonne gauche — liste + pagination */}
           <div
