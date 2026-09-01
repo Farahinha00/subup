@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import type { Dispositif, Critere } from '@/types'
 import { LABELS } from '@/lib/labels'
@@ -459,6 +459,8 @@ function DetailPanel({ d }: { d: Dispositif }) {
 
 // ── CatalogueContent ──────────────────────────────────────────────────────────
 
+const PAGE_SIZE = 10
+
 function CatalogueContent({ dispositifs }: { dispositifs: Dispositif[] }) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -466,26 +468,42 @@ function CatalogueContent({ dispositifs }: { dispositifs: Dispositif[] }) {
 
   const [filtre, setFiltre] = useState<string>('tous')
   const [selectedId, setSelectedId] = useState<string | null>(aideParam)
+  const [page, setPage] = useState(1)
+  const selectedRowRef = useRef<HTMLDivElement | null>(null)
 
   const liste = filtre === 'tous'
     ? dispositifs
     : dispositifs.filter((d) => d.categorie === filtre)
 
-  // Resolve selected device
+  const totalPages = Math.ceil(liste.length / PAGE_SIZE)
+  const pageListe = liste.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+
+  // Resolve selected device (search across all pages)
   const selected = liste.find((d) => (d.slug ?? d.id) === selectedId) ?? liste[0] ?? null
 
-  // Auto-select first item when filter changes (if current selection not in filtered list)
+  // When filter changes → reset page, auto-select first
   useEffect(() => {
+    setPage(1)
     if (liste.length > 0 && !liste.find((d) => (d.slug ?? d.id) === selectedId)) {
-      const first = liste[0]
-      setSelectedId(first.slug ?? first.id)
+      setSelectedId(liste[0].slug ?? liste[0].id)
     }
   }, [filtre]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Init from URL param
+  // Init from URL param — jump to the right page
   useEffect(() => {
-    if (aideParam) setSelectedId(aideParam)
-  }, [aideParam])
+    if (aideParam) {
+      setSelectedId(aideParam)
+      const idx = liste.findIndex((d) => (d.slug ?? d.id) === aideParam)
+      if (idx >= 0) setPage(Math.floor(idx / PAGE_SIZE) + 1)
+    }
+  }, [aideParam]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Scroll selected row into view after page/selection change
+  useEffect(() => {
+    if (selectedRowRef.current) {
+      selectedRowRef.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+    }
+  }, [selectedId, page])
 
   function handleSelect(d: Dispositif) {
     const slug = d.slug ?? d.id
@@ -506,7 +524,7 @@ function CatalogueContent({ dispositifs }: { dispositifs: Dispositif[] }) {
       <style>{`
         @media (max-width: 999px) {
           .catalogue-grid { grid-template-columns: 1fr !important; }
-          .catalogue-list-col { height: auto !important; max-height: 220px; }
+          .catalogue-list-col { height: auto !important; max-height: 320px; }
           .catalogue-detail-col { height: auto !important; min-height: 600px; }
           .catalogue-shell { height: auto !important; min-height: unset !important; }
         }
@@ -545,9 +563,9 @@ function CatalogueContent({ dispositifs }: { dispositifs: Dispositif[] }) {
         {/* Grille maître-détail */}
         <div
           className="catalogue-grid"
-          style={{ display: 'grid', gridTemplateColumns: '344px minmax(0,1fr)', gap: 18, flex: 1, minHeight: 480 }}
+          style={{ display: 'grid', gridTemplateColumns: '344px minmax(0,1fr)', gap: 18, flex: 1, minHeight: 0 }}
         >
-          {/* Colonne gauche — liste */}
+          {/* Colonne gauche — liste + pagination */}
           <div
             className="catalogue-list-col"
             style={{ background: '#fff', border: '1px solid #E7E1D9', borderRadius: 16, height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
@@ -555,31 +573,38 @@ function CatalogueContent({ dispositifs }: { dispositifs: Dispositif[] }) {
             <div style={{ padding: '13px 18px', borderBottom: '1px solid #E7E1D9', fontSize: 11.5, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#8A8378', flexShrink: 0 }}>
               {liste.length} dispositifs
             </div>
+
+            {/* Liste scrollable */}
             <div style={{ overflowY: 'auto', flex: 1 }}>
-              {liste.map((d) => {
-                const slug = d.slug ?? d.id
+              {pageListe.map((d) => {
                 const isSelected = selected?.id === d.id
                 const montant = formatMontant(d)
                 const categorieLabel = d.categorie ? LABELS.categorie_dispositif?.[d.categorie] ?? d.categorie : '—'
                 return (
                   <div
                     key={d.id}
+                    ref={isSelected ? selectedRowRef : null}
                     onClick={() => handleSelect(d)}
-                    style={{ padding: '15px 18px', borderBottom: '1px solid #F1EEE9', cursor: 'pointer', background: isSelected ? '#F7FAF8' : 'transparent' }}
+                    style={{
+                      padding: '15px 18px', borderBottom: '1px solid #F1EEE9', cursor: 'pointer',
+                      background: isSelected ? '#F7FAF8' : 'transparent',
+                      borderLeft: `3px solid ${isSelected ? '#1F5A44' : 'transparent'}`,
+                      transition: 'background 0.1s',
+                    }}
                   >
                     <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10 }}>
-                      <div style={{ fontSize: 14.5, fontWeight: 700, color: isSelected ? '#1F5A44' : '#221F1D', lineHeight: 1.35, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: isSelected ? '#1F5A44' : '#221F1D', lineHeight: 1.35, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {d.nom}
                       </div>
-                      <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 13, color: '#4A453F', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                      <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 12.5, color: '#4A453F', whiteSpace: 'nowrap', flexShrink: 0 }}>
                         {montant}
                       </div>
                     </div>
-                    <div style={{ fontSize: 12.5, color: '#8A8378', marginTop: 4, lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <div style={{ fontSize: 12, color: '#8A8378', marginTop: 4, lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {d.short_desc ?? d.organisme}
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 9, flexWrap: 'wrap' }}>
-                      <span style={{ background: '#EFEAF7', color: '#5A4A78', fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 100 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8 }}>
+                      <span style={{ background: '#EFEAF7', color: '#5A4A78', fontSize: 10.5, fontWeight: 700, padding: '3px 8px', borderRadius: 100 }}>
                         {categorieLabel}
                       </span>
                     </div>
@@ -592,10 +617,33 @@ function CatalogueContent({ dispositifs }: { dispositifs: Dispositif[] }) {
                 </div>
               )}
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div style={{ borderTop: '1px solid #E7E1D9', padding: '10px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  style={{ fontSize: 12.5, fontWeight: 600, color: page === 1 ? '#C9BFAE' : '#4A453F', background: 'none', border: 'none', cursor: page === 1 ? 'default' : 'pointer', padding: '4px 8px' }}
+                >
+                  ← Préc.
+                </button>
+                <span style={{ fontSize: 12, color: '#8A8378' }}>
+                  {page} / {totalPages}
+                </span>
+                <button
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                  style={{ fontSize: 12.5, fontWeight: 600, color: page === totalPages ? '#C9BFAE' : '#4A453F', background: 'none', border: 'none', cursor: page === totalPages ? 'default' : 'pointer', padding: '4px 8px' }}
+                >
+                  Suiv. →
+                </button>
+              </div>
+            )}
           </div>
 
-          {/* Colonne droite — panneau de détail */}
-          <div className="catalogue-detail-col" style={{ height: '100%' }}>
+          {/* Colonne droite — panneau de détail avec son propre scroll */}
+          <div className="catalogue-detail-col" style={{ height: '100%', overflow: 'hidden' }}>
             {selected ? (
               <DetailPanel key={selected.id} d={selected} />
             ) : (
