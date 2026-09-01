@@ -351,58 +351,61 @@ function DetailPanel({ d }: { d: Dispositif }) {
   return (
     <div style={{ background: '#fff', border: '1px solid #E7E1D9', borderRadius: 16, height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
-      {/* a) En-tête fixe */}
-      <div style={{ padding: '18px 28px 0', flexShrink: 0 }}>
-        <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', marginBottom: 11 }}>
-          <span style={{ background: '#EFEAF7', color: '#5A4A78', fontSize: 11.5, fontWeight: 700, padding: '4px 10px', borderRadius: 100 }}>{categorieLabel}</span>
-          <span style={{ background: '#F1EEE9', color: '#6B6560', fontSize: 11.5, fontWeight: 700, padding: '4px 10px', borderRadius: 100 }}>{typeLabel}</span>
+      {/* Zone scrollable — tout sauf le footer */}
+      <div style={{ overflowY: 'auto', flex: 1, minHeight: 0 }}>
+
+        {/* a) En-tête */}
+        <div style={{ padding: '18px 28px 0' }}>
+          <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', marginBottom: 11 }}>
+            <span style={{ background: '#EFEAF7', color: '#5A4A78', fontSize: 11.5, fontWeight: 700, padding: '4px 10px', borderRadius: 100 }}>{categorieLabel}</span>
+            <span style={{ background: '#F1EEE9', color: '#6B6560', fontSize: 11.5, fontWeight: 700, padding: '4px 10px', borderRadius: 100 }}>{typeLabel}</span>
+          </div>
+          <h2 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 21, letterSpacing: '-0.015em', lineHeight: 1.25, margin: '0 0 6px' }}>{d.nom}</h2>
+          <div style={{ fontSize: 13.5, color: '#8A8378', lineHeight: 1.4, paddingBottom: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {d.short_desc ?? d.organisme}
+          </div>
         </div>
-        <h2 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 21, letterSpacing: '-0.015em', lineHeight: 1.25, margin: '0 0 6px' }}>{d.nom}</h2>
-        <div style={{ fontSize: 13.5, color: '#8A8378', lineHeight: 1.4, paddingBottom: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {d.short_desc ?? d.organisme}
+
+        {/* b) Barre d'onglets */}
+        <div style={{ display: 'flex', gap: 16, padding: '0 28px', borderBottom: '1px solid #E7E1D9', position: 'sticky', top: 0, background: '#fff', zIndex: 1 }}>
+          {tabs.map((tab, i) => {
+            const isActive = activeTab === i
+            return (
+              <button
+                key={i}
+                onClick={() => setActiveTab(i as 0 | 1)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  fontSize: 13, fontWeight: 700,
+                  color: isActive ? '#221F1D' : '#8A8378',
+                  padding: '13px 0',
+                  marginBottom: -1,
+                  background: 'none', border: 'none',
+                  borderBottomStyle: 'solid',
+                  borderBottomWidth: 2,
+                  borderBottomColor: isActive ? '#1F5A44' : 'transparent',
+                  cursor: 'pointer', whiteSpace: 'nowrap',
+                }}
+              >
+                {tab.label}
+                {tab.badge !== undefined && (
+                  <span style={{ fontSize: 11, fontWeight: 700, color: '#8A8378', background: '#F1EEE9', padding: '2px 7px', borderRadius: 100 }}>
+                    {tab.badge}
+                  </span>
+                )}
+              </button>
+            )
+          })}
+        </div>
+
+        {/* c) Contenu onglet */}
+        <div style={{ padding: '20px 28px 28px' }}>
+          {activeTab === 0 && <TabDesc d={d} />}
+          {activeTab === 1 && <TabCriteria d={d} />}
         </div>
       </div>
 
-      {/* b) Barre d'onglets */}
-      <div style={{ display: 'flex', gap: 16, padding: '0 28px', borderBottom: '1px solid #E7E1D9', flexShrink: 0, overflow: 'hidden' }}>
-        {tabs.map((tab, i) => {
-          const isActive = activeTab === i
-          return (
-            <button
-              key={i}
-              onClick={() => setActiveTab(i as 0 | 1 | 2)}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 6,
-                fontSize: 13, fontWeight: 700,
-                color: isActive ? '#221F1D' : '#8A8378',
-                padding: '13px 0',
-                borderBottom: `2px solid ${isActive ? '#1F5A44' : 'transparent'}`,
-                marginBottom: -1,
-                background: 'none', border: 'none',
-                borderBottomStyle: 'solid',
-                borderBottomWidth: 2,
-                borderBottomColor: isActive ? '#1F5A44' : 'transparent',
-                cursor: 'pointer', whiteSpace: 'nowrap',
-              }}
-            >
-              {tab.label}
-              {tab.badge !== undefined && (
-                <span style={{ fontSize: 11, fontWeight: 700, color: '#8A8378', background: '#F1EEE9', padding: '2px 7px', borderRadius: 100 }}>
-                  {tab.badge}
-                </span>
-              )}
-            </button>
-          )
-        })}
-      </div>
-
-      {/* c) Zone de contenu */}
-      <div style={{ overflowY: 'auto', flex: 1, minHeight: 240, padding: '20px 28px 24px' }}>
-        {activeTab === 0 && <TabDesc d={d} />}
-        {activeTab === 1 && <TabCriteria d={d} />}
-      </div>
-
-      {/* Bandeau signalement (au-dessus du pied) */}
+      {/* Bandeau signalement */}
       {reportOpen && (
         <div style={{ borderTop: '1px solid #DCE9E2', background: '#F7FAF8', padding: '16px 28px', flexShrink: 0 }}>
           <div style={{ fontSize: 13.5, fontWeight: 700, marginBottom: 4 }}>Une information vous semble fausse ou incomplète ?</div>
@@ -533,7 +536,7 @@ function CatalogueContent({ dispositifs }: { dispositifs: Dispositif[] }) {
       <div
         className="catalogue-shell"
         style={{
-          padding: '20px 24px',
+          padding: '16px 20px 12px',
           height: 'calc(100vh - var(--banner-h, 0px))',
           boxSizing: 'border-box',
           display: 'flex',
