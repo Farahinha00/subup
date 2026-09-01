@@ -346,6 +346,7 @@ function DetailPanel({ d }: { d: Dispositif }) {
   const tabs: { label: React.ReactNode; badge?: number }[] = [
     { label: 'À quoi ça consiste' },
     { label: 'Critères d\'éligibilité', badge: criteres.length },
+    { label: '🔒 Dossier' },
   ]
 
   return (
@@ -373,7 +374,7 @@ function DetailPanel({ d }: { d: Dispositif }) {
             return (
               <button
                 key={i}
-                onClick={() => setActiveTab(i as 0 | 1)}
+                onClick={() => setActiveTab(i as 0 | 1 | 2)}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 6,
                   fontSize: 13, fontWeight: 700,
@@ -402,6 +403,7 @@ function DetailPanel({ d }: { d: Dispositif }) {
         <div style={{ padding: '20px 28px 28px' }}>
           {activeTab === 0 && <TabDesc d={d} />}
           {activeTab === 1 && <TabCriteria d={d} />}
+          {activeTab === 2 && <TabDossier d={d} />}
         </div>
       </div>
 
