@@ -137,12 +137,8 @@ export default async function FichePage({ params }: { params: Promise<{ slug: st
   const calendar = calendarLabel(d)
   const criteres: Critere[] = Array.isArray(d.regles?.criteres) ? d.regles.criteres : []
   const verifiedAt = d.last_verified_at ?? d.derniere_verification
-  const docsCount = d.check_items?.length ?? d.documents_requis?.length ?? 0
+  const docsCount = d.docs_parcours?.length ?? 0
   const stepsCount = d.depot_steps?.length ?? 0
-  const docsPreview = d.check_items?.slice(0, 3).map((c) => c.title)
-    ?? d.documents_requis?.slice(0, 3)
-    ?? []
-  const stepsPreview = d.depot_steps?.slice(0, 3).map((s) => s.title) ?? []
 
   const jsonLdService = {
     '@context': 'https://schema.org',
