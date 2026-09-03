@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { LogoFondoukBeta } from '@/components/layout/LogoFondouk'
 
-const SIDEBAR_ROUTES = ['/tableau-de-bord', '/resultats', '/diagnostic', '/inscription']
+const SIDEBAR_ROUTES = ['/tableau-de-bord', '/resultats', '/diagnostic', '/inscription', '/dispositifs']
 
 export default function Footer() {
   const pathname = usePathname()

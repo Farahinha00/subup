@@ -24,7 +24,7 @@ function LogoIcon({ size = 32, onDark = false }: { size?: number; onDark?: boole
 
 export { LogoIcon }
 
-const SIDEBAR_ROUTES = ['/tableau-de-bord', '/resultats', '/inscription']
+const SIDEBAR_ROUTES = ['/tableau-de-bord', '/resultats', '/inscription', '/dispositifs']
 
 export default function Header() {
   const pathname = usePathname()
