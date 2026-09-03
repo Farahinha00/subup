@@ -7,18 +7,23 @@ function PublicNav() {
       style={{
         background: 'rgba(250,248,245,0.95)',
         borderBottom: '1px solid #E7E1D9',
-        padding: '16px 32px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-        gap: 20,
         position: 'sticky',
         top: 'var(--banner-h, 0px)',
         zIndex: 20,
         backdropFilter: 'blur(10px)',
       }}
     >
+      <div style={{
+        maxWidth: 1152,
+        margin: '0 auto',
+        padding: '0 24px',
+        height: 72,
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: 20,
+      }}>
       <Link href="/" style={{ textDecoration: 'none' }}>
         <Logo size="nav" variant="beta" />
       </Link>
@@ -44,6 +49,7 @@ function PublicNav() {
         >
           Faire mon diagnostic
         </Link>
+      </div>
       </div>
     </nav>
   )
