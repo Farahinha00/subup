@@ -148,11 +148,10 @@ export default async function FichePage({ params }: { params: Promise<{ slug: st
         }}>
 
           {/* Colonne gauche */}
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 16 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', gap: 16 }}>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               <Pill color="vert">{nature}</Pill>
               {d.organisme && <Pill color="neutre">{d.organisme}</Pill>}
-              {calendar !== '—' && <Pill color="neutre">{calendar}</Pill>}
             </div>
             <h1 style={{
               fontFamily: "'Space Grotesk', sans-serif",
@@ -167,9 +166,10 @@ export default async function FichePage({ params }: { params: Promise<{ slug: st
               {d.nom}
             </h1>
             {d.short_desc && (
-              <p style={{ fontSize: 17.5, lineHeight: 1.6, color: '#4A453F', margin: 0, maxWidth: 640, textWrap: 'pretty' }}>
-                {d.short_desc}
-              </p>
+              <p
+                style={{ fontSize: 17.5, lineHeight: 1.6, color: '#4A453F', margin: 0, maxWidth: 640, textWrap: 'pretty' }}
+                dangerouslySetInnerHTML={{ __html: d.short_desc }}
+              />
             )}
           </div>
 
@@ -196,33 +196,6 @@ export default async function FichePage({ params }: { params: Promise<{ slug: st
               <p style={{ fontSize: 13.5, lineHeight: 1.55, color: '#D8D2C8', margin: 0 }}>
                 Répondez à quelques questions sur votre entreprise : Fondouk vous dit où vous en êtes sur {d.nom}, critère par critère.
               </p>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-              {[
-                { n: '01', label: 'Votre entreprise : forme, âge, effectif' },
-                { n: '02', label: 'Votre projet et le montant envisagé' },
-                { n: '03', label: 'Vos résultats, dispositif par dispositif' },
-              ].map(({ n, label }) => (
-                <div key={n} style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  border: '1px solid #4A453F',
-                  borderRadius: 9,
-                  padding: '9px 12px',
-                }}>
-                  <span style={{
-                    fontFamily: "'Space Grotesk', sans-serif",
-                    fontWeight: 700,
-                    fontSize: 11.5,
-                    color: '#E2703A',
-                    flexShrink: 0,
-                    letterSpacing: '0.02em',
-                  }}>{n}</span>
-                  <span style={{ fontSize: 12.5, fontWeight: 600, color: '#D8D2C8' }}>{label}</span>
-                </div>
-              ))}
             </div>
 
             <Link
@@ -288,12 +261,11 @@ export default async function FichePage({ params }: { params: Promise<{ slug: st
             {(d.long_desc || d.short_desc) && (
               <section>
                 <h2 style={h2Style}>En quoi consiste ce dispositif</h2>
-                <div style={{ fontSize: 15.5, lineHeight: 1.7, color: '#4A453F', textWrap: 'pretty', display: 'flex', flexDirection: 'column', gap: 14 }}>
-                  {d.long_desc
-                    ? d.long_desc.split('\n\n').filter(Boolean).map((p, i) => <p key={i} style={{ margin: 0 }}>{p}</p>)
-                    : <p style={{ margin: 0 }}>{d.short_desc}</p>
-                  }
-                </div>
+                <div
+                  className="fiche-prose"
+                  style={{ fontSize: 15.5, lineHeight: 1.7, color: '#4A453F', textWrap: 'pretty' }}
+                  dangerouslySetInnerHTML={{ __html: d.long_desc ?? d.short_desc ?? '' }}
+                />
                 {Array.isArray(d.key_facts) && d.key_facts.length > 0 && (
                   <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {(d.key_facts as string[]).map((fact, i) => (

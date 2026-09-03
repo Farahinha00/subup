@@ -164,4 +164,13 @@
     color: var(--vert);
     font-weight: 500;
   }
+
+  /* Prose HTML injecté dans les fiches dispositif */
+  .fiche-prose p { margin: 0 0 12px; }
+  .fiche-prose p:last-child { margin-bottom: 0; }
+  .fiche-prose strong, .fiche-prose b { font-weight: 700; color: #221F1D; }
+  .fiche-prose br { display: block; content: ''; margin-top: 8px; }
+  .fiche-prose ul { margin: 8px 0 12px; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+  .fiche-prose li { list-style: disc; }
+  .fiche-prose a { color: #1F5A44; text-decoration: underline; }
 }
