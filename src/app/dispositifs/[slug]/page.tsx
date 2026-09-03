@@ -45,8 +45,8 @@ function mdToHtml(text: string): string {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/\*\*(.+?)\*\*/gs, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/gs, '<em>$1</em>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
 
   const lines = escaped.split('\n')
   const parts: string[] = []
