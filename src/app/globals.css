@@ -166,11 +166,36 @@
   }
 
   /* Prose HTML injecté dans les fiches dispositif */
-  .fiche-prose p { margin: 0 0 12px; }
+  .fiche-prose p { margin: 0 0 14px; }
   .fiche-prose p:last-child { margin-bottom: 0; }
   .fiche-prose strong, .fiche-prose b { font-weight: 700; color: #221F1D; }
-  .fiche-prose br { display: block; content: ''; margin-top: 8px; }
-  .fiche-prose ul { margin: 8px 0 12px; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
-  .fiche-prose li { list-style: disc; }
+  .fiche-prose ul {
+    margin: 4px 0 14px;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .fiche-prose ul:last-child { margin-bottom: 0; }
+  .fiche-prose li {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 10px 13px;
+    background: #F7FAF8;
+    border-radius: 9px;
+    font-size: inherit;
+    line-height: 1.5;
+  }
+  .fiche-prose li::before {
+    content: '';
+    flex-shrink: 0;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #1F5A44;
+    margin-top: 7px;
+  }
   .fiche-prose a { color: #1F5A44; text-decoration: underline; }
 }

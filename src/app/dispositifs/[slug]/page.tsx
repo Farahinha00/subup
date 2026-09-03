@@ -41,22 +41,47 @@ function natureLabel(d: Dispositif): string {
 }
 
 function mdToHtml(text: string): string {
-  return text
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .split(/\n\n+/)
-    .map((block) => {
-      const lines = block.split('\n')
-      const isListBlock = lines.every((l) => /^[-•]\s/.test(l.trim()) || l.trim() === '')
-      if (isListBlock) {
-        const items = lines.filter((l) => /^[-•]\s/.test(l.trim()))
-          .map((l) => `<li>${l.replace(/^[-•]\s+/, '')}</li>`).join('')
-        return `<ul>${items}</ul>`
-      }
-      return `<p>${lines.join('<br />')}</p>`
-    })
-    .join('')
+  const escaped = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\*\*(.+?)\*\*/gs, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/gs, '<em>$1</em>')
+
+  const lines = escaped.split('\n')
+  const parts: string[] = []
+  let listItems: string[] = []
+  let paraLines: string[] = []
+
+  function flushList() {
+    if (listItems.length === 0) return
+    parts.push(`<ul>${listItems.map((l) => `<li>${l}</li>`).join('')}</ul>`)
+    listItems = []
+  }
+  function flushPara() {
+    if (paraLines.length === 0) return
+    const content = paraLines.join('<br />')
+    if (content.trim()) parts.push(`<p>${content}</p>`)
+    paraLines = []
+  }
+
+  for (const line of lines) {
+    const trimmed = line.trim()
+    if (/^[-•*]\s/.test(trimmed)) {
+      flushPara()
+      listItems.push(trimmed.replace(/^[-•*]\s+/, ''))
+    } else if (trimmed === '') {
+      flushPara()
+      flushList()
+    } else {
+      flushList()
+      paraLines.push(line)
+    }
+  }
+  flushPara()
+  flushList()
+
+  return parts.join('')
 }
 
 // ── Metadata ─────────────────────────────────────────────────────────────────
