@@ -40,6 +40,25 @@ function natureLabel(d: Dispositif): string {
   return LABELS.type_aide?.[d.type_aide] ?? d.type_aide ?? '—'
 }
 
+function mdToHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .split(/\n\n+/)
+    .map((block) => {
+      const lines = block.split('\n')
+      const isListBlock = lines.every((l) => /^[-•]\s/.test(l.trim()) || l.trim() === '')
+      if (isListBlock) {
+        const items = lines.filter((l) => /^[-•]\s/.test(l.trim()))
+          .map((l) => `<li>${l.replace(/^[-•]\s+/, '')}</li>`).join('')
+        return `<ul>${items}</ul>`
+      }
+      return `<p>${lines.join('<br />')}</p>`
+    })
+    .join('')
+}
+
 // ── Metadata ─────────────────────────────────────────────────────────────────
 
 export async function generateMetadata(
@@ -166,9 +185,10 @@ export default async function FichePage({ params }: { params: Promise<{ slug: st
               {d.nom}
             </h1>
             {d.short_desc && (
-              <p
-                style={{ fontSize: 17.5, lineHeight: 1.6, color: '#4A453F', margin: 0, maxWidth: 640, textWrap: 'pretty' }}
-                dangerouslySetInnerHTML={{ __html: d.short_desc }}
+              <div
+                className="fiche-prose"
+                style={{ fontSize: 17.5, lineHeight: 1.6, color: '#4A453F', margin: 0, maxWidth: 640 }}
+                dangerouslySetInnerHTML={{ __html: mdToHtml(d.short_desc) }}
               />
             )}
           </div>
@@ -263,8 +283,8 @@ export default async function FichePage({ params }: { params: Promise<{ slug: st
                 <h2 style={h2Style}>En quoi consiste ce dispositif</h2>
                 <div
                   className="fiche-prose"
-                  style={{ fontSize: 15.5, lineHeight: 1.7, color: '#4A453F', textWrap: 'pretty' }}
-                  dangerouslySetInnerHTML={{ __html: d.long_desc ?? d.short_desc ?? '' }}
+                  style={{ fontSize: 15.5, lineHeight: 1.7, color: '#4A453F' }}
+                  dangerouslySetInnerHTML={{ __html: mdToHtml(d.long_desc ?? d.short_desc ?? '') }}
                 />
                 {Array.isArray(d.key_facts) && d.key_facts.length > 0 && (
                   <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -419,53 +439,6 @@ export default async function FichePage({ params }: { params: Promise<{ slug: st
               </div>
 
               <div style={{ background: '#fff', border: '1px solid #E7E1D9', borderRadius: 14, overflow: 'hidden' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px,1fr))' }}>
-
-                  {/* Documents requis */}
-                  <div style={{ padding: '20px 22px', borderRight: '1px solid #F1EEE9' }}>
-                    <div style={{ fontSize: 15.5, fontWeight: 700, color: '#6B6560', marginBottom: 6 }}>Documents requis</div>
-                    <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 26, color: '#A8A199', marginBottom: 6 }}>
-                      {docsCount > 0 ? `${docsCount} pièces` : '—'}
-                    </div>
-                    <div style={{ fontSize: 13.5, color: '#8A8378', marginBottom: 12 }}>
-                      Documents à réunir pour constituer votre dossier de candidature.
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                      {(docsPreview.length > 0 ? docsPreview : ['Attestation DGI', 'Attestation CNSS', 'Bilan certifié']).map((doc, i) => (
-                        <div key={i} style={{
-                          background: '#F7F5F1', borderRadius: 8, padding: '9px 11px',
-                          display: 'flex', gap: 8, alignItems: 'center',
-                        }}>
-                          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#C9BFAE', flexShrink: 0 }} />
-                          <span style={{ fontSize: 13, color: '#8A8378' }}>{doc}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Démarches de dépôt */}
-                  <div style={{ padding: '20px 22px' }}>
-                    <div style={{ fontSize: 15.5, fontWeight: 700, color: '#6B6560', marginBottom: 6 }}>Démarches de dépôt</div>
-                    <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 26, color: '#A8A199', marginBottom: 6 }}>
-                      {stepsCount > 0 ? `${stepsCount} étapes` : '—'}
-                    </div>
-                    <div style={{ fontSize: 13.5, color: '#8A8378', marginBottom: 12 }}>
-                      Procédure officielle de dépôt du dossier auprès de l&apos;opérateur.
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                      {(stepsPreview.length > 0 ? stepsPreview : ['Prise de contact opérateur', 'Dépôt du dossier complet', 'Instruction du dossier']).map((step, i) => (
-                        <div key={i} style={{
-                          background: '#F7F5F1', borderRadius: 8, padding: '9px 11px',
-                          display: 'flex', gap: 8, alignItems: 'center',
-                        }}>
-                          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#C9BFAE', flexShrink: 0 }} />
-                          <span style={{ fontSize: 13, color: '#8A8378' }}>{step}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
                 {/* Pied visiteur */}
                 <div style={{
                   background: '#FDF3EC',
