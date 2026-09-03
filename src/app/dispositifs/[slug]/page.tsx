@@ -252,7 +252,6 @@ export default async function FichePage({ params }: { params: Promise<{ slug: st
             { label: 'Prise en charge', value: amount },
             { label: 'Nature', value: nature },
             { label: "Délai d'instruction", value: d.delai_indicatif ?? 'Variable' },
-            { label: 'Calendrier', value: calendar },
             { label: 'Périmètre', value: 'Maroc' },
           ].map(({ label, value }) => (
             <div key={label} style={{ background: '#F1EEE9', borderRadius: 12, padding: '14px 16px' }}>
@@ -439,12 +438,30 @@ export default async function FichePage({ params }: { params: Promise<{ slug: st
               </div>
 
               <div style={{ background: '#fff', border: '1px solid #E7E1D9', borderRadius: 14, overflow: 'hidden' }}>
+                {/* Volumétrie */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+                  <div style={{ padding: '20px 22px', borderRight: '1px solid #F1EEE9' }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: '#6B6560', marginBottom: 6 }}>Documents requis</div>
+                    <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 26, color: '#A8A199', marginBottom: 6 }}>
+                      {docsCount > 0 ? `${docsCount} pièces` : '—'}
+                    </div>
+                    <div style={{ fontSize: 13, color: '#8A8378', lineHeight: 1.5 }}>
+                      Checklist complète des pièces à réunir, avec modèles et attestations à jour.
+                    </div>
+                  </div>
+                  <div style={{ padding: '20px 22px' }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: '#6B6560', marginBottom: 6 }}>Démarches de dépôt</div>
+                    <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 26, color: '#A8A199', marginBottom: 6 }}>
+                      {stepsCount > 0 ? `${stepsCount} étapes` : '—'}
+                    </div>
+                    <div style={{ fontSize: 13, color: '#8A8378', lineHeight: 1.5 }}>
+                      Procédure détaillée, interlocuteur à chaque étape et délais d&apos;instruction.
+                    </div>
+                  </div>
+                </div>
+
                 {/* Pied visiteur */}
-                <div style={{
-                  background: '#FDF3EC',
-                  borderTop: '1px solid #F3D9C7',
-                  padding: '18px 22px',
-                }}>
+                <div style={{ background: '#FDF3EC', borderTop: '1px solid #F3D9C7', padding: '18px 22px' }}>
                   <p style={{ fontSize: 13.5, color: '#4A453F', margin: '0 0 12px', lineHeight: 1.5 }}>
                     Le détail des pièces et la procédure de dépôt arrivent prochainement, et resteront accessibles uniquement depuis un compte connecté.
                   </p>

@@ -23,22 +23,11 @@ function PublicNav() {
         <Logo size="nav" variant="beta" />
       </Link>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 26 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
         <Link href="/dispositifs"
           style={{ fontSize: 13.5, fontWeight: 600, color: '#1F5A44', textDecoration: 'none' }}>
           Dispositifs
         </Link>
-        <Link href="/dispositifs/operateur"
-          style={{ fontSize: 13.5, fontWeight: 500, color: '#4A453F', textDecoration: 'none' }}>
-          Par opérateur
-        </Link>
-        <Link href="/dispositifs/region"
-          style={{ fontSize: 13.5, fontWeight: 500, color: '#4A453F', textDecoration: 'none' }}>
-          Par région
-        </Link>
-      </div>
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
         <Link href="/connexion"
           style={{ fontSize: 13.5, fontWeight: 600, color: '#4A453F', textDecoration: 'none' }}>
           Connexion
@@ -82,12 +71,6 @@ function PublicFooter() {
       <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', alignItems: 'center' }}>
         <Link href="/dispositifs" style={{ fontSize: 13, fontWeight: 500, color: '#6B6560', textDecoration: 'none' }}>
           Tous les dispositifs
-        </Link>
-        <Link href="/dispositifs/operateur" style={{ fontSize: 13, fontWeight: 500, color: '#6B6560', textDecoration: 'none' }}>
-          Par opérateur
-        </Link>
-        <Link href="/dispositifs/region" style={{ fontSize: 13, fontWeight: 500, color: '#6B6560', textDecoration: 'none' }}>
-          Par région
         </Link>
         <a href="mailto:corrections@fondouk.ma"
           style={{ fontSize: 13, fontWeight: 600, color: '#1F5A44', textDecoration: 'none' }}>
