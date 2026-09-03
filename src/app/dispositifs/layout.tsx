@@ -19,7 +19,7 @@ function PublicNav() {
         backdropFilter: 'blur(10px)',
       }}
     >
-      <Link href="/dispositifs" style={{ textDecoration: 'none' }}>
+      <Link href="/" style={{ textDecoration: 'none' }}>
         <Logo size="nav" variant="beta" />
       </Link>
 
