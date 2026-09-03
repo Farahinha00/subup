@@ -24,10 +24,6 @@ function PublicNav() {
       </Link>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-        <Link href="/dispositifs"
-          style={{ fontSize: 13.5, fontWeight: 600, color: '#1F5A44', textDecoration: 'none' }}>
-          Dispositifs
-        </Link>
         <Link href="/connexion"
           style={{ fontSize: 13.5, fontWeight: 600, color: '#4A453F', textDecoration: 'none' }}>
           Connexion
