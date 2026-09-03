@@ -43,7 +43,7 @@ export default async function LandingPage() {
 
           <h1 className="font-grotesk font-bold text-ardoise leading-[1.05] tracking-tight mb-6"
               style={{ fontSize: 'clamp(36px, 4.2vw, 56px)' }}>
-            La bonne subvention,<br />trouvée en quelques minutes.
+            La bonne subvention,<br />trouvée en quelques minutes
           </h1>
 
           <p className="text-[17px] leading-relaxed text-ardoise-moyen max-w-lg mb-9">
