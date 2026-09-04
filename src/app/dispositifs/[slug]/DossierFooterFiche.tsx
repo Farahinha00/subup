@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 interface Props {
@@ -32,6 +33,7 @@ const btnStyle: React.CSSProperties = {
 }
 
 export default function DossierFooterFiche({ dispositifId }: Props) {
+  const pathname = usePathname()
   const [connected, setConnected] = useState<boolean | null>(null)
   const [notified, setNotified] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -62,7 +64,7 @@ export default function DossierFooterFiche({ dispositifId }: Props) {
         <p style={{ fontSize: 13.5, color: '#4A453F', margin: '0 0 14px', lineHeight: 1.55 }}>
           Le montage du dossier arrive prochainement dans votre espace : checklist des pièces, modèles à jour et suivi du dépôt. Nous vous prévenons dès l&apos;ouverture.
         </p>
-        <Link href="/inscription" style={btnStyle}>
+        <Link href={`/inscription?redirect=${encodeURIComponent(pathname)}`} style={btnStyle}>
           Créer mon compte pour y accéder
         </Link>
       </div>

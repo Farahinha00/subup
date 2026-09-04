@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { Logo } from '@/components/layout/LogoFondouk'
 import { createClient } from '@/lib/supabase/client'
 
 export default function PublicNav() {
   const [email, setEmail] = useState<string | null | undefined>(undefined)
+  const pathname = usePathname()
 
   useEffect(() => {
     const supabase = createClient()
@@ -20,7 +22,7 @@ export default function PublicNav() {
   async function handleSignOut() {
     const supabase = createClient()
     await supabase.auth.signOut()
-    window.location.href = '/'
+    window.location.href = pathname
   }
 
   return (
@@ -63,7 +65,8 @@ export default function PublicNav() {
             </>
           ) : (
             <>
-              <Link href="/connexion"
+              <Link
+                href={`/connexion?redirect=${encodeURIComponent(pathname)}`}
                 style={{ fontSize: 13.5, fontWeight: 600, color: '#4A453F', textDecoration: 'none' }}>
                 Connexion
               </Link>
