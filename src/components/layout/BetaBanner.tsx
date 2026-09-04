@@ -189,7 +189,7 @@ export default function BetaBanner() {
 
                 {/* Pied */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 12.5, color: '#8A8378' }}>Écran : {screen.label}</span>
+                  <span style={{ fontSize: 12.5, color: '#8A8378' }}>Page : {pathname}</span>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <button type="button" onClick={closeModal} style={{ fontSize: 13.5, fontWeight: 600, color: '#6B6560', background: 'none', border: 'none', cursor: 'pointer', padding: '9px 4px' }}>
                       Annuler
