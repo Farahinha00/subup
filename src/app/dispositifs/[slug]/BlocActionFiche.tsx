@@ -49,7 +49,7 @@ export default function BlocActionFiche({ dispositifId, dispositifNom, dispositi
 
       setTotalProjets(matches.length)
       setProjets(matches.slice(0, 3))
-      setStatus(matches.length > 0 ? 'connected' : 'visitor')
+      setStatus('connected')
     }
 
     load()
@@ -67,12 +67,20 @@ export default function BlocActionFiche({ dispositifId, dispositifNom, dispositi
         <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 20, color: '#FAF8F5', margin: '0 0 6px', lineHeight: 1.3 }}>
           Évaluer {dispositifNom} pour…
         </p>
-        <p style={{ fontSize: 13, lineHeight: 1.5, color: '#D8D2C8', margin: 0 }}>
-          Vos projets les plus éligibles à ce dispositif :
-        </p>
+        {projets.length > 0 && (
+          <p style={{ fontSize: 13, lineHeight: 1.5, color: '#D8D2C8', margin: 0 }}>
+            Vos projets les plus éligibles à ce dispositif :
+          </p>
+        )}
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+      {projets.length === 0 && (
+        <p style={{ fontSize: 13, color: '#A8A199', margin: 0, lineHeight: 1.5 }}>
+          Vous n&apos;avez pas encore lancé de diagnostic pour ce dispositif.
+        </p>
+      )}
+
+      {projets.length > 0 && <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
         {projets.map((p) => (
           <Link
             key={p.diagnosticId}
@@ -105,7 +113,7 @@ export default function BlocActionFiche({ dispositifId, dispositifNom, dispositi
             </span>
           </Link>
         ))}
-      </div>
+      </div>}
 
       {surplus > 0 && (
         <Link href="/tableau-de-bord/diagnostics"
