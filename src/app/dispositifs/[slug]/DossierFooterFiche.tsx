@@ -115,7 +115,7 @@ export default function DossierFooterFiche({ dispositifId }: Props) {
             flexShrink: 0,
           }}
         >
-          {loading ? '…' : 'Être prévenu de l'ouverture'}
+          {loading ? '…' : "Être prévenu de l'ouverture"}
         </button>
       )}
     </div>
