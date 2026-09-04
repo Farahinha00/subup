@@ -34,11 +34,12 @@ export default function BetaBanner() {
   const [feedbackType, setFeedbackType] = useState<FeedbackType>('bug')
   const [message, setMessage] = useState('')
   const [contactEmail, setContactEmail] = useState('')
+  const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
   const screen = useScreen()
   const bannerRef = useRef<HTMLDivElement>(null)
 
-  // Expose banner height as CSS custom property so sticky tobbars below can offset
+  // Expose banner height as CSS custom property
   useEffect(() => {
     const update = () => {
       if (bannerRef.current) {
@@ -51,6 +52,17 @@ export default function BetaBanner() {
     return () => ro.disconnect()
   }, [])
 
+  // Écoute l'event global pour ouvrir le modal depuis n'importe quelle page
+  useEffect(() => {
+    function onOpenFeedback(e: Event) {
+      const detail = (e as CustomEvent<{ type?: FeedbackType }>).detail
+      if (detail?.type) setFeedbackType(detail.type)
+      setModalOpen(true)
+    }
+    window.addEventListener('open-feedback', onOpenFeedback)
+    return () => window.removeEventListener('open-feedback', onOpenFeedback)
+  }, [])
+
   function closeModal() {
     setModalOpen(false)
     if (sent) {
@@ -58,20 +70,22 @@ export default function BetaBanner() {
     }
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!message.trim()) return
-
-    const typeLabel = FEEDBACK_TYPES.find((t) => t.id === feedbackType)?.label ?? feedbackType
-    const subject = `[Fondouk Feedback] ${typeLabel}`
-    const body = [
-      message.trim(),
-      contactEmail.trim() ? `\nContact : ${contactEmail.trim()}` : '',
-      `\nPage : ${screen.id}`,
-    ].join('')
-
-    window.location.href = `mailto:farah.mkt@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-    setSent(true)
+    setSending(true)
+    try {
+      await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: feedbackType, message: message.trim(), contact_email: contactEmail.trim() || null, screen: screen.id }),
+      })
+      setSent(true)
+    } catch {
+      setSent(true)
+    } finally {
+      setSending(false)
+    }
   }
 
   return (
@@ -196,7 +210,7 @@ export default function BetaBanner() {
                       Annuler
                     </button>
                     <button
-                      type="submit" disabled={!message.trim()}
+                      type="submit" disabled={!message.trim() || sending}
                       style={{
                         fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 13.5,
                         padding: '9px 18px', borderRadius: 9, border: 'none',
@@ -205,7 +219,7 @@ export default function BetaBanner() {
                         cursor: message.trim() ? 'pointer' : 'not-allowed',
                       }}
                     >
-                      Envoyer le retour
+                      {sending ? 'Envoi…' : 'Envoyer le retour'}
                     </button>
                   </div>
                 </div>

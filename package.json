@@ -23,6 +23,7 @@
     "pdfkit": "^0.19.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "resend": "^6.26.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {

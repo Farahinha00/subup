@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { Resend } from 'resend'
+
+const TYPE_LABELS: Record<string, string> = {
+  bug: 'Bug ou blocage',
+  missing_info: 'Information manquante',
+  idea: "Idée d'amélioration",
+}
 
 export async function POST(req: NextRequest) {
   const body = await req.json()
@@ -12,7 +19,8 @@ export async function POST(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  const { error } = await supabase.from('feedback').insert({
+  // Sauvegarde Supabase
+  await supabase.from('feedback').insert({
     user_id: user?.id ?? null,
     type,
     message,
@@ -21,8 +29,26 @@ export async function POST(req: NextRequest) {
     user_agent: req.headers.get('user-agent'),
   })
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  // Envoi email si RESEND_API_KEY configuré
+  const resendKey = process.env.RESEND_API_KEY
+  const recipient = process.env.FEEDBACK_RECIPIENT_EMAIL
+  if (resendKey && recipient) {
+    const resend = new Resend(resendKey)
+    const typeLabel = TYPE_LABELS[type] ?? type
+
+    await resend.emails.send({
+      from: 'Fondouk Feedback <onboarding@resend.dev>',
+      to: recipient,
+      subject: `[Fondouk] ${typeLabel}`,
+      text: [
+        `Type : ${typeLabel}`,
+        `Page : ${screen ?? '—'}`,
+        contact_email ? `Contact : ${contact_email}` : '',
+        user?.email ? `Utilisateur : ${user.email}` : '',
+        '',
+        message,
+      ].filter(Boolean).join('\n'),
+    })
   }
 
   return NextResponse.json({ ok: true })

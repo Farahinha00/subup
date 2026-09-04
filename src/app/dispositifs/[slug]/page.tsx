@@ -6,6 +6,7 @@ import type { Dispositif, Critere } from '@/types'
 import { LABELS } from '@/lib/labels'
 import BlocActionFiche from './BlocActionFiche'
 import DossierFooterFiche from './DossierFooterFiche'
+import SignalerButton from '@/components/layout/SignalerButton'
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -340,12 +341,10 @@ export default async function FichePage({ params }: { params: Promise<{ slug: st
               }}>i</span>
               <span>
                 Une information inexacte ou obsolète ?{' '}
-                <a
-                  href={`mailto:farah.mkt@gmail.com?subject=${encodeURIComponent(`Correction fiche ${d.nom}`)}`}
-                  style={{ color: '#1F5A44', borderBottom: '1px solid rgba(31,90,68,0.35)', textDecoration: 'none' }}
-                >
-                  Signalez-la à notre équipe
-                </a>{' '}
+                <SignalerButton
+                  label="Signalez-la à notre équipe"
+                  style={{ color: '#1F5A44', borderBottom: '1px solid rgba(31,90,68,0.35)', fontSize: 'inherit', fontFamily: 'inherit' }}
+                />{' '}
                 — nous vérifions sous 48h.
               </span>
             </div>

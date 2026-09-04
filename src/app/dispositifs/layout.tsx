@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import PublicNav from './PublicNav'
+import SignalerButton from '@/components/layout/SignalerButton'
 
 function PublicFooter() {
   return (
@@ -20,10 +21,10 @@ function PublicFooter() {
         <Link href="/dispositifs" style={{ fontSize: 13, fontWeight: 500, color: '#6B6560', textDecoration: 'none' }}>
           Tous les dispositifs
         </Link>
-        <a href="mailto:farah.mkt@gmail.com"
-          style={{ fontSize: 13, fontWeight: 600, color: '#1F5A44', textDecoration: 'none' }}>
-          Signaler une erreur
-        </a>
+        <SignalerButton
+          label="Signaler une erreur"
+          style={{ fontSize: 13, fontWeight: 600, color: '#1F5A44', fontFamily: 'inherit' }}
+        />
       </div>
     </footer>
   )
