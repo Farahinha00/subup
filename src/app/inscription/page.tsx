@@ -114,6 +114,7 @@ function InscriptionForm() {
   const fromDiagnostic = searchParams.get('from') === 'diagnostic'
   const initStep = searchParams.get('step') === 'profile' ? 'profile' : 'auth'
   const fromGoogle = searchParams.get('from') === 'google'
+  const redirect = searchParams.get('redirect')
 
   const [step, setStep] = useState<'auth' | 'profile' | 'email_sent'>(initStep)
   const [form, setForm] = useState({ prenom: '', nom: '', email: '', password: '', passwordConfirm: '' })
@@ -159,7 +160,7 @@ function InscriptionForm() {
     const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${siteUrl}/auth/callback?next=/tableau-de-bord`,
+        redirectTo: `${siteUrl}/auth/callback?next=${encodeURIComponent(redirect ?? '/tableau-de-bord')}`,
         queryParams: { prompt: 'select_account' },
       },
     })
@@ -225,7 +226,7 @@ function InscriptionForm() {
           } catch {}
         }
       }
-      router.push('/tableau-de-bord')
+      router.push(redirect ?? '/tableau-de-bord')
     } else {
       // Confirmation email requise
       setLoading(false)
@@ -271,7 +272,7 @@ function InscriptionForm() {
       }
       localStorage.removeItem('diagnostic_recovery_pending')
     }
-    router.push('/tableau-de-bord')
+    router.push(redirect ?? '/tableau-de-bord')
   }
 
   // ── Email confirmation sent ─────────────────────────────────────────────────

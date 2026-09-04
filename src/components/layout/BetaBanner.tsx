@@ -3,21 +3,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 
-// ── Screen detection ──────────────────────────────────────────────────────────
-
-function useScreen() {
-  const pathname = usePathname()
-  if (pathname.startsWith('/tableau-de-bord/catalogue')) return { id: 'catalog', label: 'Catalogue' }
-  if (pathname.startsWith('/resultats')) return { id: 'results', label: 'Mes résultats' }
-  if (pathname.startsWith('/deblocage')) return { id: 'unlock', label: 'Déblocage' }
-  if (pathname.startsWith('/dossier')) return { id: 'dossier', label: 'Dossier' }
-  if (pathname.startsWith('/inscription')) return { id: 'signup', label: 'Inscription' }
-  if (pathname.startsWith('/connexion')) return { id: 'signup', label: 'Connexion' }
-  if (pathname.startsWith('/tableau-de-bord')) return { id: 'dashboard', label: 'Tableau de bord' }
-  if (pathname.startsWith('/diagnostic')) return { id: 'diagnostic', label: 'Diagnostic' }
-  if (pathname === '/') return { id: 'home', label: 'Accueil' }
-  return { id: 'other', label: 'Autre' }
-}
 
 type FeedbackType = 'bug' | 'missing_info' | 'idea'
 
@@ -36,10 +21,10 @@ export default function BetaBanner() {
   const [contactEmail, setContactEmail] = useState('')
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
-  const screen = useScreen()
+  const pathname = usePathname()
   const bannerRef = useRef<HTMLDivElement>(null)
 
-  // Expose banner height as CSS custom property so sticky tobbars below can offset
+  // Expose banner height as CSS custom property
   useEffect(() => {
     const update = () => {
       if (bannerRef.current) {
@@ -50,6 +35,17 @@ export default function BetaBanner() {
     const ro = new ResizeObserver(update)
     if (bannerRef.current) ro.observe(bannerRef.current)
     return () => ro.disconnect()
+  }, [])
+
+  // Écoute l'event global pour ouvrir le modal depuis n'importe quelle page
+  useEffect(() => {
+    function onOpenFeedback(e: Event) {
+      const detail = (e as CustomEvent<{ type?: FeedbackType }>).detail
+      if (detail?.type) setFeedbackType(detail.type)
+      setModalOpen(true)
+    }
+    window.addEventListener('open-feedback', onOpenFeedback)
+    return () => window.removeEventListener('open-feedback', onOpenFeedback)
   }, [])
 
   function closeModal() {
@@ -67,7 +63,7 @@ export default function BetaBanner() {
       await fetch('/api/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: feedbackType, message: message.trim(), contact_email: contactEmail.trim() || null, screen: screen.id }),
+        body: JSON.stringify({ type: feedbackType, message: message.trim(), contact_email: contactEmail.trim() || null, screen: pathname }),
       })
       setSent(true)
     } catch {
@@ -193,7 +189,7 @@ export default function BetaBanner() {
 
                 {/* Pied */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 12.5, color: '#8A8378' }}>Écran : {screen.label}</span>
+                  <span style={{ fontSize: 12.5, color: '#8A8378' }}>Page : {pathname}</span>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <button type="button" onClick={closeModal} style={{ fontSize: 13.5, fontWeight: 600, color: '#6B6560', background: 'none', border: 'none', cursor: 'pointer', padding: '9px 4px' }}>
                       Annuler
