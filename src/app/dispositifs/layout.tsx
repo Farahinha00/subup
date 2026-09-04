@@ -20,7 +20,7 @@ function PublicFooter() {
         <Link href="/dispositifs" style={{ fontSize: 13, fontWeight: 500, color: '#6B6560', textDecoration: 'none' }}>
           Tous les dispositifs
         </Link>
-        <a href="mailto:corrections@fondouk.ma"
+        <a href="mailto:farah.mkt@gmail.com"
           style={{ fontSize: 13, fontWeight: 600, color: '#1F5A44', textDecoration: 'none' }}>
           Signaler une erreur
         </a>

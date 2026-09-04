@@ -34,7 +34,6 @@ export default function BetaBanner() {
   const [feedbackType, setFeedbackType] = useState<FeedbackType>('bug')
   const [message, setMessage] = useState('')
   const [contactEmail, setContactEmail] = useState('')
-  const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
   const screen = useScreen()
   const bannerRef = useRef<HTMLDivElement>(null)
@@ -59,22 +58,20 @@ export default function BetaBanner() {
     }
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!message.trim()) return
-    setSending(true)
-    try {
-      await fetch('/api/feedback', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: feedbackType, message: message.trim(), contact_email: contactEmail.trim() || null, screen: screen.id }),
-      })
-      setSent(true)
-    } catch {
-      setSent(true)
-    } finally {
-      setSending(false)
-    }
+
+    const typeLabel = FEEDBACK_TYPES.find((t) => t.id === feedbackType)?.label ?? feedbackType
+    const subject = `[Fondouk Feedback] ${typeLabel}`
+    const body = [
+      message.trim(),
+      contactEmail.trim() ? `\nContact : ${contactEmail.trim()}` : '',
+      `\nPage : ${screen.id}`,
+    ].join('')
+
+    window.location.href = `mailto:farah.mkt@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    setSent(true)
   }
 
   return (
@@ -199,7 +196,7 @@ export default function BetaBanner() {
                       Annuler
                     </button>
                     <button
-                      type="submit" disabled={!message.trim() || sending}
+                      type="submit" disabled={!message.trim()}
                       style={{
                         fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 13.5,
                         padding: '9px 18px', borderRadius: 9, border: 'none',
@@ -208,7 +205,7 @@ export default function BetaBanner() {
                         cursor: message.trim() ? 'pointer' : 'not-allowed',
                       }}
                     >
-                      {sending ? 'Envoi…' : 'Envoyer le retour'}
+                      Envoyer le retour
                     </button>
                   </div>
                 </div>

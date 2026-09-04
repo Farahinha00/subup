@@ -341,7 +341,7 @@ export default async function FichePage({ params }: { params: Promise<{ slug: st
               <span>
                 Une information inexacte ou obsolète ?{' '}
                 <a
-                  href={`mailto:corrections@fondouk.ma?subject=${encodeURIComponent(`Correction fiche ${d.nom}`)}`}
+                  href={`mailto:farah.mkt@gmail.com?subject=${encodeURIComponent(`Correction fiche ${d.nom}`)}`}
                   style={{ color: '#1F5A44', borderBottom: '1px solid rgba(31,90,68,0.35)', textDecoration: 'none' }}
                 >
                   Signalez-la à notre équipe
