@@ -54,7 +54,7 @@ export default async function LandingPage() {
 
           {multiPays ? (
             <div className="grid sm:grid-cols-2 gap-3 max-w-sm mb-8">
-              <Link href="/diagnostic?pays=MA" className="btn-primary py-3.5 text-center rounded-[10px]">
+              <Link href="/diagnostic?pays=MA" className="btn-diagnostic py-3.5 text-center rounded-[10px]">
                 🇲🇦 Maroc
               </Link>
               <Link href="/diagnostic?pays=FR" className="btn-secondary py-3.5 text-center rounded-[10px]">
@@ -64,7 +64,7 @@ export default async function LandingPage() {
           ) : (
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8">
               <Link href="/diagnostic"
-                className="btn-primary py-4 px-7 text-base rounded-[10px] inline-block">
+                className="btn-diagnostic py-4 px-7 text-base rounded-[10px] inline-block">
                 Vérifier mon éligibilité →
               </Link>
               <Link

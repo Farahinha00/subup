@@ -180,17 +180,17 @@ export default async function FichePage({ params }: { params: Promise<{ slug: st
           <span style={{ color: '#4A453F', fontWeight: 600 }}>{d.nom}</span>
         </nav>
 
-        {/* Hero — 2 colonnes */}
+        {/* Hero — 2 colonnes alignées par le bas */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'minmax(0,1fr) 348px',
           gap: 30,
-          alignItems: 'stretch',
-          marginBottom: 28,
+          alignItems: 'end',
+          marginBottom: 40,
         }}>
 
-          {/* Colonne gauche */}
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', gap: 16 }}>
+          {/* Colonne gauche : pills + titre + desc + 2 métriques en bas */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               <Pill color="vert">{nature}</Pill>
               {d.organisme && <Pill color="neutre">{d.organisme}</Pill>}
@@ -214,6 +214,23 @@ export default async function FichePage({ params }: { params: Promise<{ slug: st
                 dangerouslySetInnerHTML={{ __html: mdToHtml(d.short_desc) }}
               />
             )}
+
+            {/* 2 métriques — alignées en bas avec le bas de la carte action */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 8 }}>
+              {[
+                { label: 'Prise en charge', value: amount },
+                { label: "Délai d'instruction", value: d.delai_indicatif ?? 'Variable' },
+              ].map(({ label, value }) => (
+                <div key={label} style={{ background: '#F1EEE9', borderRadius: 12, padding: '14px 16px' }}>
+                  <div style={{ fontSize: 10.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#8A8378', marginBottom: 6 }}>
+                    {label}
+                  </div>
+                  <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 15, color: '#221F1D', lineHeight: 1.3 }}>
+                    {value}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Bloc d'action — client island (visiteur / connecté) */}
@@ -222,30 +239,6 @@ export default async function FichePage({ params }: { params: Promise<{ slug: st
             dispositifNom={d.nom}
             dispositifSlug={d.slug}
           />
-        </div>
-
-        {/* Chiffres clés */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-          gap: 10,
-          marginBottom: 40,
-        }}>
-          {[
-            { label: 'Prise en charge', value: amount },
-            { label: 'Nature', value: nature },
-            { label: "Délai d'instruction", value: d.delai_indicatif ?? 'Variable' },
-            { label: 'Périmètre', value: 'Maroc' },
-          ].map(({ label, value }) => (
-            <div key={label} style={{ background: '#F1EEE9', borderRadius: 12, padding: '14px 16px' }}>
-              <div style={{ fontSize: 10.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#8A8378', marginBottom: 6 }}>
-                {label}
-              </div>
-              <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 15, color: '#221F1D', lineHeight: 1.3 }}>
-                {value}
-              </div>
-            </div>
-          ))}
         </div>
 
         {/* Corps — 2 colonnes */}

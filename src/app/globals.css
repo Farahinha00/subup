@@ -105,6 +105,16 @@
   }
   .btn-vert:hover { background-color: var(--vert-clair); }
 
+  /* CTA diagnostic / éligibilité — toujours orange */
+  .btn-diagnostic {
+    @apply font-semibold px-5 py-2.5 rounded-[9px] active:scale-95 transition-all duration-150
+           disabled:opacity-40 disabled:cursor-not-allowed text-sm;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    background-color: var(--corail);
+    color: var(--fond);
+  }
+  .btn-diagnostic:hover { background-color: var(--corail-fonce); }
+
   /* --- Cartes --- */
   .card {
     @apply bg-white rounded-[16px] p-5;
