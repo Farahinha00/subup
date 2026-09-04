@@ -3,21 +3,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 
-// ── Screen detection ──────────────────────────────────────────────────────────
-
-function useScreen() {
-  const pathname = usePathname()
-  if (pathname.startsWith('/tableau-de-bord/catalogue')) return { id: 'catalog', label: 'Catalogue' }
-  if (pathname.startsWith('/resultats')) return { id: 'results', label: 'Mes résultats' }
-  if (pathname.startsWith('/deblocage')) return { id: 'unlock', label: 'Déblocage' }
-  if (pathname.startsWith('/dossier')) return { id: 'dossier', label: 'Dossier' }
-  if (pathname.startsWith('/inscription')) return { id: 'signup', label: 'Inscription' }
-  if (pathname.startsWith('/connexion')) return { id: 'signup', label: 'Connexion' }
-  if (pathname.startsWith('/tableau-de-bord')) return { id: 'dashboard', label: 'Tableau de bord' }
-  if (pathname.startsWith('/diagnostic')) return { id: 'diagnostic', label: 'Diagnostic' }
-  if (pathname === '/') return { id: 'home', label: 'Accueil' }
-  return { id: 'other', label: 'Autre' }
-}
 
 type FeedbackType = 'bug' | 'missing_info' | 'idea'
 
@@ -36,7 +21,7 @@ export default function BetaBanner() {
   const [contactEmail, setContactEmail] = useState('')
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
-  const screen = useScreen()
+  const pathname = usePathname()
   const bannerRef = useRef<HTMLDivElement>(null)
 
   // Expose banner height as CSS custom property
@@ -78,7 +63,7 @@ export default function BetaBanner() {
       await fetch('/api/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: feedbackType, message: message.trim(), contact_email: contactEmail.trim() || null, screen: screen.id }),
+        body: JSON.stringify({ type: feedbackType, message: message.trim(), contact_email: contactEmail.trim() || null, screen: pathname }),
       })
       setSent(true)
     } catch {

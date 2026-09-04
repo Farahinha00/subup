@@ -39,13 +39,14 @@ export async function POST(req: NextRequest) {
     await resend.emails.send({
       from: 'Fondouk Feedback <onboarding@resend.dev>',
       to: recipient,
-      subject: `[Fondouk] ${typeLabel}`,
+      subject: `[Fondouk – ${typeLabel}] ${screen ?? ''}`,
       text: [
-        `Type : ${typeLabel}`,
-        `Page : ${screen ?? '—'}`,
-        contact_email ? `Contact : ${contact_email}` : '',
-        user?.email ? `Utilisateur : ${user.email}` : '',
+        `Type     : ${typeLabel}`,
+        `Page     : ${screen ?? '—'}`,
+        user?.email    ? `Compte   : ${user.email}` : '',
+        contact_email  ? `Contact  : ${contact_email}` : '',
         '',
+        '─────────────────────────────',
         message,
       ].filter(Boolean).join('\n'),
     })
