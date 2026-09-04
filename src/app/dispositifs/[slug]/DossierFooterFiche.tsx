@@ -1,23 +1,45 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
 interface Props {
   dispositifId: string
 }
 
+const footerStyle: React.CSSProperties = {
+  background: '#F1EEE9',
+  borderTop: '1px solid #E7E1D9',
+  borderRadius: '0 0 13px 13px',
+  padding: '18px 22px',
+}
+
+const btnStyle: React.CSSProperties = {
+  display: 'block',
+  width: '100%',
+  textAlign: 'center',
+  fontFamily: "'Space Grotesk', sans-serif",
+  fontWeight: 600,
+  fontSize: 13.5,
+  background: '#221F1D',
+  color: '#FAF8F5',
+  borderRadius: 9,
+  padding: '12px 20px',
+  textDecoration: 'none',
+  border: 'none',
+  cursor: 'pointer',
+}
+
 export default function DossierFooterFiche({ dispositifId }: Props) {
-  const [connected, setConnected] = useState(false)
+  const [connected, setConnected] = useState<boolean | null>(null)
   const [notified, setNotified] = useState(false)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     const supabase = createClient()
-    supabase.auth.getUser().then(({ data }) => {
-      setConnected(!!data.user)
-    })
-  }, [])
+    supabase.auth.getUser().then(({ data }) => setConnected(!!data.user))
+  }, [dispositifId])
 
   async function handleNotify() {
     if (loading || notified) return
@@ -33,88 +55,31 @@ export default function DossierFooterFiche({ dispositifId }: Props) {
     setLoading(false)
   }
 
-  if (!connected) {
+  // Chargement — on rend l'état visiteur par défaut (SSR-safe)
+  if (connected === null || !connected) {
     return (
-      <div style={{
-        background: '#E2703A',
-        borderRadius: '0 0 13px 13px',
-        padding: '16px 20px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 16,
-        flexWrap: 'wrap',
-      }}>
-        <p style={{ margin: 0, fontSize: 13.5, fontWeight: 600, color: '#FAF8F5', lineHeight: 1.4 }}>
-          Créez votre compte pour accéder à la préparation de dossier
+      <div style={footerStyle}>
+        <p style={{ fontSize: 13.5, color: '#4A453F', margin: '0 0 14px', lineHeight: 1.55 }}>
+          Le montage du dossier arrive prochainement dans votre espace : checklist des pièces, modèles à jour et suivi du dépôt. Nous vous prévenons dès l&apos;ouverture.
         </p>
-        <a
-          href="/inscription"
-          style={{
-            fontFamily: "'Space Grotesk', sans-serif",
-            fontWeight: 700,
-            fontSize: 13,
-            background: '#FAF8F5',
-            color: '#E2703A',
-            borderRadius: 8,
-            padding: '10px 16px',
-            textDecoration: 'none',
-            whiteSpace: 'nowrap',
-            flexShrink: 0,
-          }}
-        >
-          Créer mon compte
-        </a>
+        <Link href="/inscription" style={btnStyle}>
+          Créer mon compte pour y accéder
+        </Link>
       </div>
     )
   }
 
   return (
-    <div style={{
-      background: '#E2703A',
-      borderRadius: '0 0 13px 13px',
-      padding: '16px 20px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      gap: 16,
-      flexWrap: 'wrap',
-    }}>
-      <p style={{ margin: 0, fontSize: 13, color: '#FAF8F5', lineHeight: 1.45, maxWidth: 340 }}>
-        Le montage du dossier arrive prochainement dans votre espace. Vous serez notifié dès que c&apos;est disponible.
+    <div style={footerStyle}>
+      <p style={{ fontSize: 13.5, color: '#4A453F', margin: '0 0 14px', lineHeight: 1.55 }}>
+        Le montage du dossier arrive prochainement dans votre espace : checklist des pièces, modèles à jour et suivi du dépôt. Nous vous prévenons dès l&apos;ouverture.
       </p>
       {notified ? (
-        <span style={{
-          fontFamily: "'Space Grotesk', sans-serif",
-          fontWeight: 600,
-          fontSize: 13,
-          color: '#FAF8F5',
-          padding: '10px 16px',
-          border: '1.5px solid rgba(250,248,245,0.5)',
-          borderRadius: 8,
-          whiteSpace: 'nowrap',
-          flexShrink: 0,
-        }}>
-          ✓ Vous serez notifié
-        </span>
+        <div style={{ ...btnStyle, background: '#EAF3EE', color: '#1F5A44', cursor: 'default' }}>
+          ✓ Vous serez notifié à l&apos;ouverture
+        </div>
       ) : (
-        <button
-          onClick={handleNotify}
-          disabled={loading}
-          style={{
-            fontFamily: "'Space Grotesk', sans-serif",
-            fontWeight: 700,
-            fontSize: 13,
-            background: '#FAF8F5',
-            color: '#E2703A',
-            borderRadius: 8,
-            padding: '10px 16px',
-            border: 'none',
-            cursor: loading ? 'wait' : 'pointer',
-            whiteSpace: 'nowrap',
-            flexShrink: 0,
-          }}
-        >
+        <button onClick={handleNotify} disabled={loading} style={{ ...btnStyle, width: '100%' }}>
           {loading ? '…' : "Être prévenu de l'ouverture"}
         </button>
       )}
