@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import type { Dispositif, Critere } from '@/types'
 import { LABELS } from '@/lib/labels'
+import BlocActionFiche from './BlocActionFiche'
+import DossierFooterFiche from './DossierFooterFiche'
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -214,52 +216,12 @@ export default async function FichePage({ params }: { params: Promise<{ slug: st
             )}
           </div>
 
-          {/* Bloc d'action — visiteur */}
-          <div style={{
-            background: '#221F1D',
-            borderRadius: 16,
-            padding: 24,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 16,
-          }}>
-            <div>
-              <p style={{
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontWeight: 700,
-                fontSize: 20,
-                color: '#FAF8F5',
-                margin: '0 0 8px',
-                lineHeight: 1.3,
-              }}>
-                Ce dispositif est-il pour vous ?
-              </p>
-              <p style={{ fontSize: 13.5, lineHeight: 1.55, color: '#D8D2C8', margin: 0 }}>
-                Répondez à quelques questions sur votre entreprise : Fondouk vous dit où vous en êtes sur {d.nom}, critère par critère.
-              </p>
-            </div>
-
-            <Link
-              href={`/diagnostic?dispositif=${d.slug}`}
-              style={{
-                display: 'block',
-                textAlign: 'center',
-                background: '#E2703A',
-                color: '#FAF8F5',
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontWeight: 600,
-                fontSize: 14,
-                borderRadius: 10,
-                padding: '14px 20px',
-                textDecoration: 'none',
-              }}
-            >
-              Vérifier mon éligibilité — 3 min
-            </Link>
-            <p style={{ textAlign: 'center', fontSize: 12, color: '#8A8378', margin: 0 }}>
-              Gratuit, sans engagement
-            </p>
-          </div>
+          {/* Bloc d'action — client island (visiteur / connecté) */}
+          <BlocActionFiche
+            dispositifId={d.id}
+            dispositifNom={d.nom}
+            dispositifSlug={d.slug}
+          />
         </div>
 
         {/* Chiffres clés */}
@@ -481,29 +443,8 @@ export default async function FichePage({ params }: { params: Promise<{ slug: st
                   </div>
                 </div>
 
-                {/* Pied visiteur */}
-                <div style={{ background: '#FDF3EC', borderTop: '1px solid #F3D9C7', padding: '18px 22px' }}>
-                  <p style={{ fontSize: 13.5, color: '#4A453F', margin: '0 0 12px', lineHeight: 1.5 }}>
-                    Le détail des pièces et la procédure de dépôt arrivent prochainement, et resteront accessibles uniquement depuis un compte connecté.
-                  </p>
-                  <Link
-                    href="/inscription"
-                    style={{
-                      display: 'block',
-                      textAlign: 'center',
-                      background: '#221F1D',
-                      color: '#FAF8F5',
-                      fontFamily: "'Space Grotesk', sans-serif",
-                      fontWeight: 600,
-                      fontSize: 13.5,
-                      borderRadius: 9,
-                      padding: '12px 20px',
-                      textDecoration: 'none',
-                    }}
-                  >
-                    Créer mon compte pour y accéder
-                  </Link>
-                </div>
+                {/* Footer dossier — client island (visiteur / connecté) */}
+                <DossierFooterFiche dispositifId={d.id} />
               </div>
             </section>
           </div>
