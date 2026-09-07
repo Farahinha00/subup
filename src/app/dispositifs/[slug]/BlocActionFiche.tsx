@@ -118,7 +118,7 @@ export default function BlocActionFiche({ dispositifId, dispositifNom, dispositi
           {projets.map((p) => (
             <Link
               key={p.diagnosticId}
-              href={`/resultats/${p.diagnosticId}`}
+              href={`/dispositifs/${dispositifSlug}?diag=${p.diagnosticId}`}
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
