@@ -77,7 +77,7 @@ function DispoCard({ d }: { d: Dispositif }) {
       className="dispo-card"
     >
       {/* Top row: pill + montant */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
         <span style={{
           display: 'inline-block',
           fontSize: 11.5,
@@ -87,10 +87,9 @@ function DispoCard({ d }: { d: Dispositif }) {
           color: '#1F5A44',
           background: '#EAF3EE',
           border: '1px solid #DCE9E2',
-          borderRadius: 100,
+          borderRadius: 8,
           padding: '4px 10px',
-          whiteSpace: 'nowrap',
-          flexShrink: 0,
+          lineHeight: 1.4,
         }}>
           {typeLabel}
         </span>
@@ -102,6 +101,7 @@ function DispoCard({ d }: { d: Dispositif }) {
             color: '#4A453F',
             whiteSpace: 'nowrap',
             flexShrink: 0,
+            paddingTop: 2,
           }}>
             {montant}
           </span>
