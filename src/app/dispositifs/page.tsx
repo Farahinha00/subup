@@ -33,26 +33,6 @@ function formatDate(dateStr: string | null | undefined): string | null {
   } catch { return null }
 }
 
-// ── Facette chips data ───────────────────────────────────────────────────────
-
-const TYPE_CHIPS = [
-  { label: 'Subvention', slug: 'subvention' },
-  { label: 'Prime', slug: 'prime' },
-  { label: 'Prêt bonifié', slug: 'pret' },
-  { label: 'Garantie', slug: 'garantie' },
-  { label: 'Accompagnement', slug: 'accompagnement' },
-  { label: 'Aide à l\'embauche', slug: 'emploi' },
-]
-
-const OPERATEUR_CHIPS = [
-  { label: 'Maroc PME', slug: 'maroc-pme' },
-  { label: 'Tamwilcom', slug: 'tamwilcom' },
-  { label: 'ANAPEC', slug: 'anapec' },
-  { label: 'CRI', slug: 'cri' },
-  { label: 'SMIT', slug: 'smit' },
-  { label: 'Ministère de l\'Industrie', slug: 'ministere-industrie' },
-]
-
 // ── Card ─────────────────────────────────────────────────────────────────────
 
 function DispoCard({ d }: { d: Dispositif }) {
@@ -188,8 +168,6 @@ export default async function DispositifsPage() {
     <>
       <style>{`
         .dispo-card:hover { border-color: #1F5A44 !important; }
-        .facette-chip:hover { border-color: #1F5A44 !important; color: #1F5A44 !important; }
-        .facette-chip-op:hover { border-color: #1F5A44 !important; color: #1F5A44 !important; }
       `}</style>
 
       <div style={{ maxWidth: 1152, margin: '0 auto', padding: '42px 32px 54px' }}>
@@ -220,58 +198,6 @@ export default async function DispositifsPage() {
             Chaque fiche détaille le montant, la nature de l&apos;aide et les critères d&apos;éligibilité
             publiés par l&apos;opérateur — en consultation libre, sans création de compte.
           </p>
-        </div>
-
-        {/* Facettes */}
-        <div style={{ marginBottom: 28, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {/* Par nature */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-            {TYPE_CHIPS.map((c) => (
-              <Link
-                key={c.slug}
-                href={`/dispositifs/type/${c.slug}`}
-                className="facette-chip"
-                style={{
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: '#4A453F',
-                  background: '#F1EEE9',
-                  border: '1px solid #E7E1D9',
-                  borderRadius: 100,
-                  padding: '7px 14px',
-                  textDecoration: 'none',
-                  transition: 'border-color 0.12s, color 0.12s',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {c.label}
-              </Link>
-            ))}
-          </div>
-          {/* Par opérateur */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-            {OPERATEUR_CHIPS.map((c) => (
-              <Link
-                key={c.slug}
-                href={`/dispositifs/operateur/${c.slug}`}
-                className="facette-chip-op"
-                style={{
-                  fontSize: 13,
-                  fontWeight: 500,
-                  color: '#6B6560',
-                  background: '#FAF8F5',
-                  border: '1px solid #E7E1D9',
-                  borderRadius: 100,
-                  padding: '7px 14px',
-                  textDecoration: 'none',
-                  transition: 'border-color 0.12s, color 0.12s',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {c.label}
-              </Link>
-            ))}
-          </div>
         </div>
 
         {/* Ligne de comptage */}

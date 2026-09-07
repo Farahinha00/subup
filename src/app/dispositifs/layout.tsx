@@ -21,12 +21,6 @@ function PublicFooter() {
         <Link href="/dispositifs" style={{ fontSize: 13, fontWeight: 500, color: '#6B6560', textDecoration: 'none' }}>
           Tous les dispositifs
         </Link>
-        <Link href="/dispositifs/operateur" style={{ fontSize: 13, fontWeight: 500, color: '#6B6560', textDecoration: 'none' }}>
-          Par opérateur
-        </Link>
-        <Link href="/dispositifs/region" style={{ fontSize: 13, fontWeight: 500, color: '#6B6560', textDecoration: 'none' }}>
-          Par région
-        </Link>
         <SignalerButton
           label="Signaler une erreur"
           style={{ fontSize: 13, fontWeight: 600, color: '#1F5A44', fontFamily: 'inherit' }}
