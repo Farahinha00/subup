@@ -59,7 +59,14 @@ export default function Header() {
           <LogoFondoukBeta height={42} />
         </Link>
 
-        <nav className="flex items-center gap-3 text-sm">
+        <nav className="flex items-center gap-6 text-sm">
+          <Link
+            href="/dispositifs"
+            className="hidden sm:block"
+            style={{ fontWeight: 500, fontSize: 14, color: '#4A453F', textDecoration: 'none' }}
+          >
+            Dispositifs
+          </Link>
           {!loading && (
             userEmail ? (
               <>

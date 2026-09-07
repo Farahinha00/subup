@@ -68,7 +68,7 @@ export default async function LandingPage() {
                 Vérifier mon éligibilité →
               </Link>
               <Link
-                href={isLoggedIn ? '/tableau-de-bord/catalogue' : '/connexion?redirect=%2Ftableau-de-bord%2Fcatalogue'}
+                href="/dispositifs"
                 className="text-[15px] font-semibold text-ardoise hover:text-vert transition flex items-center gap-1.5"
               >
                 Voir les dispositifs →

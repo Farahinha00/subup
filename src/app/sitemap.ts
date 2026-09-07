@@ -7,6 +7,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Pages statiques indexables
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: BASE, lastModified: new Date(), changeFrequency: 'weekly', priority: 1 },
+    { url: `${BASE}/dispositifs`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.95 },
     { url: `${BASE}/diagnostic`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.9 },
   ]
 
