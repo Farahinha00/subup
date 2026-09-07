@@ -6,7 +6,7 @@ import type { Dispositif, Critere } from '@/types'
 import { LABELS } from '@/lib/labels'
 import BlocActionFiche from './BlocActionFiche'
 import DossierFooterFiche from './DossierFooterFiche'
-import SignalerButton from '@/components/layout/SignalerButton'
+import CriteresSection from './CriteresSection'
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -286,76 +286,13 @@ export default async function FichePage({
               </section>
             )}
 
-            {/* Critères */}
-            {criteres.length > 0 && (
-              <section>
-                <h2 style={h2Style}>Critères d&apos;éligibilité</h2>
-                <div style={{ border: '1px solid #E7E1D9', borderRadius: 14, overflow: 'hidden', background: '#fff' }}>
-                  {criteres.map((c, i) => (
-                    <div key={c.id ?? i} style={{
-                      display: 'flex', alignItems: 'flex-start', gap: 14,
-                      padding: '15px 18px',
-                      borderBottom: i < criteres.length - 1 ? '1px solid #F1EEE9' : 'none',
-                    }}>
-                      <span style={{
-                        flexShrink: 0, width: 7, height: 7, borderRadius: '50%',
-                        background: '#1F5A44', marginTop: 7,
-                      }} />
-                      <span style={{ fontSize: 14.5, fontWeight: 600, color: '#221F1D', lineHeight: 1.5 }}>
-                        {c.label}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+            {/* Critères + signalement — client island (statuts enrichis si diagId) */}
+            <CriteresSection
+              criteres={criteres}
+              dispositifId={d.id}
+              diagId={diagId}
+            />
 
-                {/* Encadré orange — info operateur */}
-                <div style={{
-                  marginTop: 12,
-                  background: '#FDF3EC',
-                  border: '1px solid #F3D9C7',
-                  borderRadius: 12,
-                  padding: '14px 16px',
-                  display: 'flex',
-                  gap: 10,
-                  fontSize: 13.5,
-                  lineHeight: 1.6,
-                  color: '#4A453F',
-                }}>
-                  <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 13, color: '#E2703A', flexShrink: 0 }}>i</span>
-                  <span>
-                    Ces critères sont ceux publiés par l&apos;opérateur. Savoir si{' '}
-                    <strong>votre</strong> entreprise les remplit relève du diagnostic, qui reste dans votre espace.
-                  </span>
-                </div>
-              </section>
-            )}
-
-            {/* Encadré signalement */}
-            <div style={{
-              background: '#F1EEE9',
-              border: '1px solid #E7E1D9',
-              borderRadius: 12,
-              padding: '14px 16px',
-              display: 'flex',
-              gap: 12,
-              fontSize: 13.5,
-              lineHeight: 1.6,
-              color: '#4A453F',
-            }}>
-              <span style={{
-                flexShrink: 0, width: 17, height: 17, borderRadius: '50%',
-                border: '1.5px solid #8A8378', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 11, fontWeight: 700, color: '#8A8378', marginTop: 2,
-              }}>i</span>
-              <span>
-                Une information inexacte ou obsolète ?{' '}
-                <SignalerButton
-                  label="Signalez-la à notre équipe"
-                  style={{ color: '#1F5A44', borderBottom: '1px solid rgba(31,90,68,0.35)', fontSize: 'inherit', fontFamily: 'inherit' }}
-                />{' '}
-                — nous vérifions sous 48h.
-              </span>
-            </div>
           </div>
 
           {/* Colonne droite */}

@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import type { CritereResultat } from '@/types'
 
 interface ProjetEligibilite {
   diagnosticId: string
@@ -14,10 +13,7 @@ interface ProjetEligibilite {
 
 interface DiagResult {
   score: number
-  statut: string
-  criteres_ok: CritereResultat[]
-  criteres_manquants: CritereResultat[]
-  criteres_bloquants: CritereResultat[]
+  titre: string | null
 }
 
 interface Props {
@@ -40,24 +36,16 @@ export default function BlocActionFiche({ dispositifId, dispositifNom, dispositi
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { setStatus('visitor'); return }
 
-      // Contexte diagnostic : afficher le score + les critères de ce diagnostic
+      // Contexte diagnostic : afficher le score + le titre du projet
       if (diagId) {
-        const { data: result } = await supabase
-          .from('resultats')
-          .select('score, statut, criteres_ok, criteres_manquants, criteres_bloquants')
-          .eq('diagnostic_id', diagId)
-          .eq('dispositif_id', dispositifId)
-          .single()
-
-        if (result) {
-          setDiagResult({
-            score: Math.round(result.score),
-            statut: result.statut,
-            criteres_ok: result.criteres_ok ?? [],
-            criteres_manquants: result.criteres_manquants ?? [],
-            criteres_bloquants: result.criteres_bloquants ?? [],
-          })
-        }
+        const [{ data: result }, { data: diag }] = await Promise.all([
+          supabase.from('resultats').select('score').eq('diagnostic_id', diagId).eq('dispositif_id', dispositifId).single(),
+          supabase.from('diagnostics').select('titre').eq('id', diagId).single(),
+        ])
+        setDiagResult({
+          score: result ? Math.round(result.score) : 0,
+          titre: diag?.titre ?? null,
+        })
         setStatus('diag')
         return
       }
@@ -181,50 +169,6 @@ export default function BlocActionFiche({ dispositifId, dispositifNom, dispositi
 
 // ── Bloc connecté via diagnostic ──────────────────────────────────────────────
 
-function CritereList({
-  items,
-  icon,
-  iconColor,
-  label,
-  labelColor,
-}: {
-  items: CritereResultat[]
-  icon: string
-  iconColor: string
-  label: string
-  labelColor: string
-}) {
-  if (items.length === 0) return null
-  return (
-    <div>
-      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: labelColor, marginBottom: 6 }}>
-        {label} ({items.length})
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-        {items.map((c) => (
-          <div
-            key={c.id}
-            style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: 8,
-              fontSize: 12.5,
-              color: '#D8D2C8',
-              lineHeight: 1.4,
-              background: 'rgba(255,255,255,0.04)',
-              borderRadius: 7,
-              padding: '7px 10px',
-            }}
-          >
-            <span style={{ color: iconColor, flexShrink: 0, marginTop: 1 }}>{icon}</span>
-            <span>{c.label}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
 function BlocConnecteDiag({
   result, diagId, dispositifNom, dispositifSlug,
 }: {
@@ -233,62 +177,35 @@ function BlocConnecteDiag({
   dispositifNom: string
   dispositifSlug: string
 }) {
+  const score = result?.score ?? 0
+  const titre = result?.titre
+
   return (
     <div style={cardStyle}>
       <p style={titleStyle}>
         Votre éligibilité à {dispositifNom}
       </p>
 
-      {result ? (
-        <>
-          {/* Score */}
-          <div style={{ textAlign: 'center', padding: '4px 0 8px' }}>
-            <div style={{
-              fontFamily: "'Space Grotesk', sans-serif",
-              fontWeight: 700,
-              fontSize: 52,
-              lineHeight: 1,
-              color: result.score >= 70 ? '#7BC49A' : '#E2703A',
-            }}>
-              {result.score}%
-            </div>
-            <div style={{ fontSize: 13, color: '#A8A199', marginTop: 8 }}>
-              d&apos;éligibilité estimée
-            </div>
+      <div style={{ textAlign: 'center', padding: '4px 0 4px' }}>
+        {titre && (
+          <div style={{ fontSize: 13, color: '#A8A199', marginBottom: 6 }}>
+            &laquo;&nbsp;{titre}&nbsp;&raquo; est éligible à
           </div>
+        )}
+        <div style={{
+          fontFamily: "'Space Grotesk', sans-serif",
+          fontWeight: 700,
+          fontSize: 52,
+          lineHeight: 1,
+          color: score >= 70 ? '#7BC49A' : '#E2703A',
+        }}>
+          {score}%
+        </div>
+        <div style={{ fontSize: 11.5, color: '#6B6560', marginTop: 8 }}>
+          ✦ Estimation basée sur votre diagnostic
+        </div>
+      </div>
 
-          {/* Critères */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <CritereList
-              items={result.criteres_ok}
-              icon="✓"
-              iconColor="#7BC49A"
-              label="Critères validés"
-              labelColor="#7BC49A"
-            />
-            <CritereList
-              items={result.criteres_manquants}
-              icon="◐"
-              iconColor="#E2703A"
-              label="À confirmer"
-              labelColor="#E2703A"
-            />
-            <CritereList
-              items={result.criteres_bloquants}
-              icon="✕"
-              iconColor="#C9BFAE"
-              label="Non remplis"
-              labelColor="#8A8378"
-            />
-          </div>
-        </>
-      ) : (
-        <p style={{ fontSize: 13, color: '#A8A199', margin: 0, lineHeight: 1.5 }}>
-          Aucun résultat trouvé pour ce diagnostic.
-        </p>
-      )}
-
-      {/* Retour aux résultats */}
       <Link
         href={`/resultats/${diagId}`}
         style={{

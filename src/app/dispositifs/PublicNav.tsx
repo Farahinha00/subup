@@ -45,19 +45,20 @@ export default function PublicNav() {
         flexWrap: 'wrap',
         gap: 20,
       }}>
-        <Link href="/dispositifs" style={{ textDecoration: 'none' }}>
-          <Logo size="nav" variant="beta" />
-        </Link>
-
-        <nav style={{ display: 'flex', alignItems: 'center', gap: 24, fontSize: 14 }}>
+        {/* Logo + lien Dispositifs groupés à gauche */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+          <Link href="/dispositifs" style={{ textDecoration: 'none' }}>
+            <Logo size="nav" variant="beta" />
+          </Link>
           <Link href="/dispositifs" style={{
-            fontWeight: 600,
-            color: '#1F5A44',
+            fontSize: 14,
+            fontWeight: 500,
+            color: '#4A453F',
             textDecoration: 'none',
           }}>
             Dispositifs
           </Link>
-        </nav>
+        </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           {/* undefined = en cours de chargement, on ne rend rien pour éviter le flash */}
