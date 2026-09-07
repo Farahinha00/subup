@@ -183,15 +183,10 @@ function BlocConnecteDiag({
   return (
     <div style={cardStyle}>
       <p style={titleStyle}>
-        Votre éligibilité à {dispositifNom}
+        {titre ? <>&laquo;&nbsp;{titre}&nbsp;&raquo; est éligible à</> : <>Votre éligibilité à {dispositifNom}</>}
       </p>
 
       <div style={{ textAlign: 'center', padding: '4px 0 4px' }}>
-        {titre && (
-          <div style={{ fontSize: 13, color: '#A8A199', marginBottom: 6 }}>
-            &laquo;&nbsp;{titre}&nbsp;&raquo; est éligible à
-          </div>
-        )}
         <div style={{
           fontFamily: "'Space Grotesk', sans-serif",
           fontWeight: 700,
