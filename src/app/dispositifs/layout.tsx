@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import PublicNav from './PublicNav'
 import SignalerButton from '@/components/layout/SignalerButton'
 
 function PublicFooter() {
@@ -32,9 +31,8 @@ function PublicFooter() {
 
 export default function DispositifsLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#FAF8F5' }}>
-      <PublicNav />
-      <main style={{ flex: 1 }}>{children}</main>
+    <div style={{ background: '#FAF8F5' }}>
+      <main>{children}</main>
       <PublicFooter />
     </div>
   )
