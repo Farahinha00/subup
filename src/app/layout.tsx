@@ -5,7 +5,7 @@ import Footer from '@/components/layout/Footer'
 import BetaBanner from '@/components/layout/BetaBanner'
 import { Analytics } from '@vercel/analytics/next'
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://fondouk.ma'
+const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.moroccan-fondouk.com'
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE),
@@ -17,6 +17,7 @@ export const metadata: Metadata = {
     'Diagnostic gratuit. Fondouk identifie les aides publiques marocaines accessibles à votre entreprise : Charte TPME, MOWAKABA, ISTITMAR, Innov Invest, Digital PME.',
   keywords: ['aides publiques Maroc', 'subventions entreprise Maroc', 'TPME', 'MOWAKABA', 'ISTITMAR', 'Innov Invest', 'financement PME Maroc'],
   robots: { index: true, follow: true },
+  alternates: { canonical: BASE },
   openGraph: {
     type: 'website',
     locale: 'fr_MA',

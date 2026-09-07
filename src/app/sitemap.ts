@@ -1,32 +1,33 @@
 import type { MetadataRoute } from 'next'
+import { createClient } from '@/lib/supabase/server'
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://fondouk.ma'
+const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.moroccan-fondouk.com'
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  return [
-    {
-      url: BASE,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 1,
-    },
-    {
-      url: `${BASE}/diagnostic`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.9,
-    },
-    {
-      url: `${BASE}/inscription`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
-      url: `${BASE}/connexion`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.5,
-    },
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  // Pages statiques indexables
+  const staticRoutes: MetadataRoute.Sitemap = [
+    { url: BASE, lastModified: new Date(), changeFrequency: 'weekly', priority: 1 },
+    { url: `${BASE}/diagnostic`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.9 },
   ]
+
+  // Fiches dispositifs — pages SEO principales
+  try {
+    const supabase = await createClient()
+    const { data: dispositifs } = await supabase
+      .from('dispositifs')
+      .select('slug, updated_at')
+      .eq('actif', true)
+      .order('updated_at', { ascending: false })
+
+    const ficheRoutes: MetadataRoute.Sitemap = (dispositifs ?? []).map((d) => ({
+      url: `${BASE}/dispositifs/${d.slug}`,
+      lastModified: d.updated_at ? new Date(d.updated_at) : new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.85,
+    }))
+
+    return [...staticRoutes, ...ficheRoutes]
+  } catch {
+    return staticRoutes
+  }
 }
