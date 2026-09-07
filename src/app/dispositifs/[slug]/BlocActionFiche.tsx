@@ -3,12 +3,21 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import type { CritereResultat } from '@/types'
 
 interface ProjetEligibilite {
   diagnosticId: string
   titre: string
   date: string
   score: number
+}
+
+interface DiagResult {
+  score: number
+  statut: string
+  criteres_ok: CritereResultat[]
+  criteres_manquants: CritereResultat[]
+  criteres_bloquants: CritereResultat[]
 }
 
 interface Props {
@@ -22,7 +31,7 @@ export default function BlocActionFiche({ dispositifId, dispositifNom, dispositi
   const [status, setStatus] = useState<'loading' | 'visitor' | 'connected' | 'diag'>('loading')
   const [projets, setProjets] = useState<ProjetEligibilite[]>([])
   const [totalProjets, setTotalProjets] = useState(0)
-  const [diagScore, setDiagScore] = useState<number | null>(null)
+  const [diagResult, setDiagResult] = useState<DiagResult | null>(null)
 
   useEffect(() => {
     const supabase = createClient()
@@ -31,16 +40,24 @@ export default function BlocActionFiche({ dispositifId, dispositifNom, dispositi
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { setStatus('visitor'); return }
 
-      // Contexte diagnostic : afficher uniquement le score de ce diagnostic
+      // Contexte diagnostic : afficher le score + les critères de ce diagnostic
       if (diagId) {
         const { data: result } = await supabase
           .from('resultats')
-          .select('score')
+          .select('score, statut, criteres_ok, criteres_manquants, criteres_bloquants')
           .eq('diagnostic_id', diagId)
           .eq('dispositif_id', dispositifId)
           .single()
 
-        setDiagScore(result ? Math.round(result.score) : null)
+        if (result) {
+          setDiagResult({
+            score: Math.round(result.score),
+            statut: result.statut,
+            criteres_ok: result.criteres_ok ?? [],
+            criteres_manquants: result.criteres_manquants ?? [],
+            criteres_bloquants: result.criteres_bloquants ?? [],
+          })
+        }
         setStatus('diag')
         return
       }
@@ -79,7 +96,7 @@ export default function BlocActionFiche({ dispositifId, dispositifNom, dispositi
   if (status === 'diag') {
     return (
       <BlocConnecteDiag
-        score={diagScore}
+        result={diagResult}
         diagId={diagId!}
         dispositifNom={dispositifNom}
         dispositifSlug={dispositifSlug}
@@ -92,7 +109,7 @@ export default function BlocActionFiche({ dispositifId, dispositifNom, dispositi
   return (
     <div style={cardStyle}>
       <div>
-        <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 20, color: '#FAF8F5', margin: '0 0 6px', lineHeight: 1.3 }}>
+        <p style={titleStyle}>
           Évaluer {dispositifNom} pour…
         </p>
         {projets.length > 0 && (
@@ -162,41 +179,116 @@ export default function BlocActionFiche({ dispositifId, dispositifNom, dispositi
   )
 }
 
-function BlocConnecteDiag({
-  score, diagId, dispositifNom, dispositifSlug,
+// ── Bloc connecté via diagnostic ──────────────────────────────────────────────
+
+function CritereList({
+  items,
+  icon,
+  iconColor,
+  label,
+  labelColor,
 }: {
-  score: number | null
+  items: CritereResultat[]
+  icon: string
+  iconColor: string
+  label: string
+  labelColor: string
+}) {
+  if (items.length === 0) return null
+  return (
+    <div>
+      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: labelColor, marginBottom: 6 }}>
+        {label} ({items.length})
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+        {items.map((c) => (
+          <div
+            key={c.id}
+            style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: 8,
+              fontSize: 12.5,
+              color: '#D8D2C8',
+              lineHeight: 1.4,
+              background: 'rgba(255,255,255,0.04)',
+              borderRadius: 7,
+              padding: '7px 10px',
+            }}
+          >
+            <span style={{ color: iconColor, flexShrink: 0, marginTop: 1 }}>{icon}</span>
+            <span>{c.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function BlocConnecteDiag({
+  result, diagId, dispositifNom, dispositifSlug,
+}: {
+  result: DiagResult | null
   diagId: string
   dispositifNom: string
   dispositifSlug: string
 }) {
   return (
     <div style={cardStyle}>
-      <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 20, color: '#FAF8F5', margin: 0, lineHeight: 1.3 }}>
+      <p style={titleStyle}>
         Votre éligibilité à {dispositifNom}
       </p>
 
-      {score !== null ? (
-        <div style={{ textAlign: 'center', padding: '8px 0' }}>
-          <div style={{
-            fontFamily: "'Space Grotesk', sans-serif",
-            fontWeight: 700,
-            fontSize: 52,
-            lineHeight: 1,
-            color: score >= 70 ? '#7BC49A' : '#E2703A',
-          }}>
-            {score}%
+      {result ? (
+        <>
+          {/* Score */}
+          <div style={{ textAlign: 'center', padding: '4px 0 8px' }}>
+            <div style={{
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontWeight: 700,
+              fontSize: 52,
+              lineHeight: 1,
+              color: result.score >= 70 ? '#7BC49A' : '#E2703A',
+            }}>
+              {result.score}%
+            </div>
+            <div style={{ fontSize: 13, color: '#A8A199', marginTop: 8 }}>
+              d&apos;éligibilité estimée
+            </div>
           </div>
-          <div style={{ fontSize: 13, color: '#A8A199', marginTop: 8 }}>
-            d&apos;éligibilité estimée
+
+          {/* Critères */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <CritereList
+              items={result.criteres_ok}
+              icon="✓"
+              iconColor="#7BC49A"
+              label="Critères validés"
+              labelColor="#7BC49A"
+            />
+            <CritereList
+              items={result.criteres_manquants}
+              icon="◐"
+              iconColor="#E2703A"
+              label="À confirmer"
+              labelColor="#E2703A"
+            />
+            <CritereList
+              items={result.criteres_bloquants}
+              icon="✕"
+              iconColor="#C9BFAE"
+              label="Non remplis"
+              labelColor="#8A8378"
+            />
           </div>
-        </div>
+        </>
       ) : (
         <p style={{ fontSize: 13, color: '#A8A199', margin: 0, lineHeight: 1.5 }}>
           Aucun résultat trouvé pour ce diagnostic.
         </p>
       )}
 
+      {/* Retour aux résultats */}
       <Link
         href={`/resultats/${diagId}`}
         style={{
@@ -224,11 +316,13 @@ function BlocConnecteDiag({
   )
 }
 
+// ── Bloc visiteur ─────────────────────────────────────────────────────────────
+
 function BlocVisiteur({ dispositifNom, dispositifSlug }: { dispositifNom: string; dispositifSlug: string }) {
   return (
     <div style={cardStyle}>
       <div>
-        <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 20, color: '#FAF8F5', margin: '0 0 8px', lineHeight: 1.3 }}>
+        <p style={titleStyle}>
           Ce dispositif est-il pour vous ?
         </p>
         <p style={{ fontSize: 13.5, lineHeight: 1.55, color: '#D8D2C8', margin: 0 }}>
@@ -259,6 +353,8 @@ function BlocVisiteur({ dispositifNom, dispositifSlug }: { dispositifNom: string
   )
 }
 
+// ── Styles partagés ───────────────────────────────────────────────────────────
+
 const cardStyle: React.CSSProperties = {
   background: '#221F1D',
   borderRadius: 16,
@@ -266,6 +362,15 @@ const cardStyle: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   gap: 16,
+}
+
+const titleStyle: React.CSSProperties = {
+  fontFamily: "'Space Grotesk', sans-serif",
+  fontWeight: 700,
+  fontSize: 20,
+  color: '#FAF8F5',
+  margin: 0,
+  lineHeight: 1.3,
 }
 
 const ctaStyle: React.CSSProperties = {
