@@ -106,9 +106,9 @@ export default function ResultatsClient({
             </Link>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Link href="/tableau-de-bord/catalogue"
+            <Link href="/dispositifs"
               style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 13.5, background: '#F1EEE9', color: '#4A453F', borderRadius: 9, padding: '9px 18px', textDecoration: 'none' }}>
-              Catalogue
+              Dispositifs
             </Link>
           </div>
         </div>

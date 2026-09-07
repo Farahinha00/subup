@@ -9,7 +9,7 @@ import { LogoFondoukBetaDark } from '@/components/layout/LogoFondouk'
 const NAV = [
   { label: 'Tableau de bord', href: '/tableau-de-bord', exact: true },
   { label: 'Diagnostics', href: '/tableau-de-bord/diagnostics' },
-  { label: 'Catalogue', href: '/tableau-de-bord/catalogue' },
+  { label: 'Dispositifs', href: '/dispositifs' },
 ]
 
 function initiales(prenom?: string | null, nom?: string | null, email?: string | null) {

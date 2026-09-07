@@ -17,7 +17,7 @@ function formatMontant(montant: number, devise: string): string {
   return `Jusqu'à ${montant} ${devise}`
 }
 
-export default function CarteDispositif({ resultat }: Props) {
+export default function CarteDispositif({ resultat, diagnosticId }: Props) {
   const d = resultat.dispositif!
   const devise = d.devise ?? 'MAD'
   const score = resultat.score
@@ -31,7 +31,9 @@ export default function CarteDispositif({ resultat }: Props) {
     : d.taux ? `Jusqu'à ${d.taux}% du projet` : 'Variable'
 
   const nature = LABELS.type_aide?.[d.type_aide] ?? d.type_aide
-  const catalogueHref = `/tableau-de-bord/catalogue?aide=${d.slug ?? d.id}`
+  const catalogueHref = diagnosticId
+    ? `/dispositifs/${d.slug ?? d.id}?diag=${diagnosticId}`
+    : `/dispositifs/${d.slug ?? d.id}`
 
   const validCount = resultat.criteres_ok?.length ?? 0
   const checkCount = resultat.criteres_manquants?.length ?? 0

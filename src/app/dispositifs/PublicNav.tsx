@@ -49,6 +49,16 @@ export default function PublicNav() {
           <Logo size="nav" variant="beta" />
         </Link>
 
+        <nav style={{ display: 'flex', alignItems: 'center', gap: 24, fontSize: 14 }}>
+          <Link href="/dispositifs" style={{
+            fontWeight: 600,
+            color: '#1F5A44',
+            textDecoration: 'none',
+          }}>
+            Dispositifs
+          </Link>
+        </nav>
+
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           {/* undefined = en cours de chargement, on ne rend rien pour éviter le flash */}
           {email === undefined ? null : email ? (

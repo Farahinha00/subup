@@ -122,8 +122,15 @@ export async function generateMetadata(
 
 // ── Page ─────────────────────────────────────────────────────────────────────
 
-export default async function FichePage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function FichePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>
+  searchParams: Promise<{ diag?: string }>
+}) {
   const { slug } = await params
+  const { diag: diagId } = await searchParams
   const supabase = await createClient()
   const { data: raw } = await supabase
     .from('dispositifs')
@@ -239,6 +246,7 @@ export default async function FichePage({ params }: { params: Promise<{ slug: st
             dispositifId={d.id}
             dispositifNom={d.nom}
             dispositifSlug={d.slug}
+            diagId={diagId}
           />
         </div>
 

@@ -15,12 +15,14 @@ interface Props {
   dispositifId: string
   dispositifNom: string
   dispositifSlug: string
+  diagId?: string
 }
 
-export default function BlocActionFiche({ dispositifId, dispositifNom, dispositifSlug }: Props) {
-  const [status, setStatus] = useState<'loading' | 'visitor' | 'connected'>('loading')
+export default function BlocActionFiche({ dispositifId, dispositifNom, dispositifSlug, diagId }: Props) {
+  const [status, setStatus] = useState<'loading' | 'visitor' | 'connected' | 'diag'>('loading')
   const [projets, setProjets] = useState<ProjetEligibilite[]>([])
   const [totalProjets, setTotalProjets] = useState(0)
+  const [diagScore, setDiagScore] = useState<number | null>(null)
 
   useEffect(() => {
     const supabase = createClient()
@@ -29,6 +31,21 @@ export default function BlocActionFiche({ dispositifId, dispositifNom, dispositi
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { setStatus('visitor'); return }
 
+      // Contexte diagnostic : afficher uniquement le score de ce diagnostic
+      if (diagId) {
+        const { data: result } = await supabase
+          .from('resultats')
+          .select('score')
+          .eq('diagnostic_id', diagId)
+          .eq('dispositif_id', dispositifId)
+          .single()
+
+        setDiagScore(result ? Math.round(result.score) : null)
+        setStatus('diag')
+        return
+      }
+
+      // Mode normal : liste des projets pour ce dispositif
       const [{ data: diags }, { data: results }] = await Promise.all([
         supabase.from('diagnostics').select('id, titre, created_at').order('created_at', { ascending: false }),
         supabase.from('resultats').select('diagnostic_id, score').eq('dispositif_id', dispositifId),
@@ -53,10 +70,21 @@ export default function BlocActionFiche({ dispositifId, dispositifNom, dispositi
     }
 
     load()
-  }, [dispositifId])
+  }, [dispositifId, diagId])
 
   if (status === 'loading' || status === 'visitor') {
     return <BlocVisiteur dispositifNom={dispositifNom} dispositifSlug={dispositifSlug} />
+  }
+
+  if (status === 'diag') {
+    return (
+      <BlocConnecteDiag
+        score={diagScore}
+        diagId={diagId!}
+        dispositifNom={dispositifNom}
+        dispositifSlug={dispositifSlug}
+      />
+    )
   }
 
   const surplus = totalProjets - 3
@@ -80,40 +108,42 @@ export default function BlocActionFiche({ dispositifId, dispositifNom, dispositi
         </p>
       )}
 
-      {projets.length > 0 && <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-        {projets.map((p) => (
-          <Link
-            key={p.diagnosticId}
-            href={`/resultats/${p.diagnosticId}`}
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              gap: 12,
-              border: '1px solid #4A453F',
-              borderRadius: 9,
-              padding: '11px 13px',
-              textDecoration: 'none',
-            }}
-          >
-            <div style={{ minWidth: 0 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#FAF8F5', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {p.titre}
+      {projets.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+          {projets.map((p) => (
+            <Link
+              key={p.diagnosticId}
+              href={`/resultats/${p.diagnosticId}`}
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                gap: 12,
+                border: '1px solid #4A453F',
+                borderRadius: 9,
+                padding: '11px 13px',
+                textDecoration: 'none',
+              }}
+            >
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#FAF8F5', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {p.titre}
+                </div>
+                <div style={{ fontSize: 11.5, color: '#A8A199', marginTop: 2 }}>{p.date}</div>
               </div>
-              <div style={{ fontSize: 11.5, color: '#A8A199', marginTop: 2 }}>{p.date}</div>
-            </div>
-            <span style={{
-              fontFamily: "'Space Grotesk', sans-serif",
-              fontWeight: 700,
-              fontSize: 15,
-              flexShrink: 0,
-              color: p.score >= 70 ? '#7BC49A' : '#E2703A',
-            }}>
-              {p.score}%
-            </span>
-          </Link>
-        ))}
-      </div>}
+              <span style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontWeight: 700,
+                fontSize: 15,
+                flexShrink: 0,
+                color: p.score >= 70 ? '#7BC49A' : '#E2703A',
+              }}>
+                {p.score}%
+              </span>
+            </Link>
+          ))}
+        </div>
+      )}
 
       {surplus > 0 && (
         <Link href="/tableau-de-bord/diagnostics"
@@ -122,10 +152,69 @@ export default function BlocActionFiche({ dispositifId, dispositifNom, dispositi
         </Link>
       )}
 
+      <Link href={`/diagnostic?dispositif=${dispositifSlug}`} style={ctaStyle}>
+        Nouveau diagnostic
+      </Link>
+      <p style={{ textAlign: 'center', fontSize: 12, color: '#8A8378', margin: 0 }}>
+        Vos diagnostics restent privés
+      </p>
+    </div>
+  )
+}
+
+function BlocConnecteDiag({
+  score, diagId, dispositifNom, dispositifSlug,
+}: {
+  score: number | null
+  diagId: string
+  dispositifNom: string
+  dispositifSlug: string
+}) {
+  return (
+    <div style={cardStyle}>
+      <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 20, color: '#FAF8F5', margin: 0, lineHeight: 1.3 }}>
+        Votre éligibilité à {dispositifNom}
+      </p>
+
+      {score !== null ? (
+        <div style={{ textAlign: 'center', padding: '8px 0' }}>
+          <div style={{
+            fontFamily: "'Space Grotesk', sans-serif",
+            fontWeight: 700,
+            fontSize: 52,
+            lineHeight: 1,
+            color: score >= 70 ? '#7BC49A' : '#E2703A',
+          }}>
+            {score}%
+          </div>
+          <div style={{ fontSize: 13, color: '#A8A199', marginTop: 8 }}>
+            d&apos;éligibilité estimée
+          </div>
+        </div>
+      ) : (
+        <p style={{ fontSize: 13, color: '#A8A199', margin: 0, lineHeight: 1.5 }}>
+          Aucun résultat trouvé pour ce diagnostic.
+        </p>
+      )}
+
       <Link
-        href={`/diagnostic?dispositif=${dispositifSlug}`}
-        style={ctaStyle}
+        href={`/resultats/${diagId}`}
+        style={{
+          display: 'block',
+          textAlign: 'center',
+          fontSize: 13,
+          fontWeight: 600,
+          color: '#A8A199',
+          textDecoration: 'none',
+          border: '1px solid #4A453F',
+          borderRadius: 9,
+          padding: '10px 14px',
+        }}
       >
+        ← Voir tous mes résultats
+      </Link>
+
+      <Link href={`/diagnostic?dispositif=${dispositifSlug}`} style={ctaStyle}>
         Nouveau diagnostic
       </Link>
       <p style={{ textAlign: 'center', fontSize: 12, color: '#8A8378', margin: 0 }}>
@@ -145,6 +234,20 @@ function BlocVisiteur({ dispositifNom, dispositifSlug }: { dispositifNom: string
         <p style={{ fontSize: 13.5, lineHeight: 1.55, color: '#D8D2C8', margin: 0 }}>
           Répondez à quelques questions sur votre entreprise : Fondouk vous dit où vous en êtes sur {dispositifNom}, critère par critère.
         </p>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+        {[
+          { n: '01', label: 'Votre entreprise : forme, âge, effectif' },
+          { n: '02', label: 'Votre projet et le montant envisagé' },
+          { n: '03', label: 'Vos résultats, dispositif par dispositif' },
+        ].map((s) => (
+          <div key={s.n} style={{ display: 'flex', alignItems: 'center', gap: 10, border: '1px solid #4A453F', borderRadius: 9, padding: '9px 12px' }}>
+            <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 11.5, color: '#E2703A', flexShrink: 0 }}>
+              {s.n}
+            </span>
+            <span style={{ fontSize: 12.5, fontWeight: 600, color: '#D8D2C8' }}>{s.label}</span>
+          </div>
+        ))}
       </div>
       <Link href={`/diagnostic?dispositif=${dispositifSlug}`} style={ctaStyle}>
         Vérifier mon éligibilité — 3 min
